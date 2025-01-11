@@ -4,6 +4,10 @@ namespace Modules\Payment\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Payment\Services\DiscountService;
+use Modules\Payment\Services\InvoiceService;
+use Modules\Payment\Services\MultiCurrencyService;
+use Modules\Payment\Services\SubscriptionService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -36,6 +40,11 @@ class PaymentServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        $this->app->singleton(InvoiceService::class);
+        $this->app->singleton(MultiCurrencyService::class);
+        $this->app->singleton(DiscountService::class);
+        $this->app->singleton(SubscriptionService::class);
     }
 
     /**

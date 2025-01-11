@@ -17,3 +17,10 @@ use Modules\Payment\Http\Controllers\PaymentController;
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::apiResource('payment', PaymentController::class)->names('payment');
 });
+
+Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function () {
+    Route::post('initiate', 'initiatePayment')->name('initiate');
+    Route::post('verify/{transactionId}', 'verifyPayment')->name('verify');
+    Route::post('refund', 'refundPayment')->name('refund');
+    Route::post('ipn/{provider}', 'handleIPN')->name('ipn');
+});
