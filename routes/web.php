@@ -14,6 +14,6 @@ use Modules\Payment\Http\Controllers\PaymentController;
 |
 */
 
-Route::group([], function () {
-    Route::resource('payment', PaymentController::class)->names('payment');
-});
+// Route::group([], function () {
+//     Route::resource('payment', PaymentController::class)->names('payment');
+// });

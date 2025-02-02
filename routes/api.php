@@ -15,12 +15,16 @@ use Modules\Payment\Http\Controllers\PaymentController;
 */
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('payment', PaymentController::class)->names('payment');
-});
-
-Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function () {
-    Route::post('initiate', 'initiatePayment')->name('initiate');
-    Route::post('verify/{transactionId}', 'verifyPayment')->name('verify');
-    Route::post('refund', 'refundPayment')->name('refund');
-    Route::post('ipn/{provider}', 'handleIPN')->name('ipn');
+    Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function () {
+        Route::post('make', 'makePayment')->name('make');
+        Route::post('verify/{transactionId}', 'verifyPayment')->name('verify');
+        Route::post('refund', 'refundPayment')->name('refund');
+        Route::post('discount', 'applyDiscount')->name('discount');
+        Route::withoutMiddleware(['auth:sanctum'])->group(function () {
+            Route::post('ipn/{provider}', 'ipn')->name('ipn');
+            Route::post('success/{provider}', 'success')->name('success');
+            Route::post('fail/{provider}', 'fail')->name('fail');
+            Route::post('cancel/{provider}', 'cancel')->name('cancel');
+        });
+    });
 });

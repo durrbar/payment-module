@@ -5,30 +5,36 @@ namespace Modules\Payment\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Modules\Payment\Drivers\BasePaymentDriver;
-use Modules\Payment\Repositories\PaymentRepository;
+use Modules\Payment\Http\Requests\PaymentRequest;
+use Modules\Payment\Http\Requests\RefundRequest;
 use Modules\Payment\Services\DiscountService;
+use Modules\Payment\Services\PaymentService;
 
 class PaymentController extends Controller
 {
+    protected PaymentService $paymentService;
+
+    public function __construct(PaymentService $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
+
     /**
      * Make payment through the selected provider.
      */
-    public function makePayment(Request $request)
+    public function makePayment(PaymentRequest $request)
     {
-        try {
-            $provider = $this->resolveProvider($request->input('provider'));
+        $validated = $request->validated();
 
-            $repository = new PaymentRepository($provider);
-
-            $response = $repository->initiatePayment($request->all());
-
-            return response()->json($response, 200);
-        } catch (Exception $e) {
-            Log::error('Payment initiation failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment initiation failed'], 400);
-        }
+        return $this->handlePaymentServiceMethod(function () use ($validated) {
+            $response = $this->paymentService->initiatePayment(
+                $validated['tran_id'],
+                $validated['provider']
+            );
+            return response()->json($response, Response::HTTP_OK);
+        });
     }
 
     /**
@@ -36,40 +42,27 @@ class PaymentController extends Controller
      */
     public function verifyPayment(Request $request, $transactionId)
     {
-        try {
-            $provider = $this->resolveProvider($request->input('provider'));
-
-            $repository = new PaymentRepository($provider);
-
-            $response = $repository->verifyPayment($transactionId);
-
-            return response()->json($response, 200);
-        } catch (Exception $e) {
-            Log::error('Payment verification failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment verification failed'], 400);
-        }
+        return $this->handlePaymentServiceMethod(function () use ($transactionId, $request) {
+            $response = $this->paymentService->verifyPayment($transactionId, $request->input('provider'));
+            return response()->json($response, Response::HTTP_OK);
+        });
     }
 
     /**
      * Refund a payment with the selected provider.
      */
-    public function refundPayment(Request $request)
+    public function refundPayment(RefundRequest $request)
     {
-        try {
-            $provider = $this->resolveProvider($request->input('provider'));
+        $validated = $request->validated();
 
-            $repository = new PaymentRepository($provider);
-
-            $response = $repository->refundPayment(
-                $request->input('transaction_id'),
-                $request->input('amount')
+        return $this->handlePaymentServiceMethod(function () use ($validated) {
+            $response = $this->paymentService->refundPayment(
+                $validated['tran_id'],
+                $validated['amount'],
+                $validated['provider']
             );
-
-            return response()->json($response, 200);
-        } catch (Exception $e) {
-            Log::error('Payment refund failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Payment refund failed'], 400);
-        }
+            return response()->json($response, Response::HTTP_OK);
+        });
     }
 
     /**
@@ -77,7 +70,7 @@ class PaymentController extends Controller
      */
     public function applyDiscount(Request $request)
     {
-        try {
+        return $this->handlePaymentServiceMethod(function () use ($request) {
             $discountService = app(DiscountService::class);
 
             $discountedAmount = $discountService->applyDiscount(
@@ -87,57 +80,64 @@ class PaymentController extends Controller
 
             return response()->json([
                 'discounted_amount' => $discountedAmount
-            ], 200);
-        } catch (Exception $e) {
-            Log::error('Discount application failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Invalid discount code or amount'], 400);
-        }
-    }
-
-    public function ipn(Request $request, string $provider)
-    {
-        try {
-            // Resolve the provider dynamically based on the URL
-            $providerInstance = $this->resolveProvider($provider);
-
-            // Initialize the repository with the provider
-            $repository = new PaymentRepository($providerInstance);
-
-            // Handle the IPN notification
-            return $repository->handleIPN($request->all());
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-        }
+            ], Response::HTTP_OK);
+        });
     }
 
     /**
-     * Resolve the correct payment provider.
-     *
-     * @param string $providerName
-     * @return object
+     * Handle IPN (Instant Payment Notification).
      */
-    private function resolveProvider(string $providerName): BasePaymentDriver
+    public function ipn(Request $request, string $provider)
     {
-        $providerClasses = [
-            'bkash' => \Modules\Payment\Drivers\BkashDriver::class,
-            'dbblrocket' => \Modules\Payment\Drivers\DBBLRocketDriver::class,
-            'islamicwallet' => \Modules\Payment\Drivers\IslamicWalletDriver::class,
-            'mcash' => \Modules\Payment\Drivers\MCashDriver::class,
-            'mycash' => \Modules\Payment\Drivers\MYCashDriver::class,
-            'nagad' => \Modules\Payment\Drivers\NagadDriver::class,
-            'portwallet' => \Modules\Payment\Drivers\PortWalletDriver::class,
-            'sslcommerz' => \Modules\Payment\Drivers\SSLCommerzDriver::class,
-            'upay' => \Modules\Payment\Drivers\UpayDriver::class,
-            'surecash' => \Modules\Payment\Drivers\SureCashDriver::class,
-            '2checkout' => \Modules\Payment\Drivers\TwoCheckoutDriver::class,
-        ];
+        return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
+            $response = $this->paymentService->handleIPN($request->all(), $provider);
+            return response()->json($response);
+        });
+    }
 
-        // Check if the provider exists
-        if (!isset($providerClasses[strtolower($providerName)])) {
-            throw new \Exception('Invalid payment provider: ' . $providerName);
+    /**
+     * Handle success payment notification.
+     */
+    public function success(Request $request, string $provider)
+    {
+        return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
+            $response = $this->paymentService->handleSuccess($request->all(), $provider);
+            return response()->json($response);
+        });
+    }
+
+    /**
+     * Handle failed payment notification.
+     */
+    public function fail(Request $request, string $provider)
+    {
+        return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
+            $response = $this->paymentService->handleFailure($request->all(), $provider);
+            return response()->json($response);
+        });
+    }
+
+    /**
+     * Handle canceled payment notification.
+     */
+    public function cancel(Request $request, string $provider)
+    {
+        return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
+            $response = $this->paymentService->handleCancel($request->all(), $provider);
+            return response()->json($response);
+        });
+    }
+
+    /**
+     * Centralized error handling for payment service methods.
+     */
+    private function handlePaymentServiceMethod(callable $method)
+    {
+        try {
+            return $method();
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
-
-        // Return the resolved provider instance
-        return new $providerClasses[strtolower($providerName)]();
     }
 }

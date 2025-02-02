@@ -1,8 +1,10 @@
 <?php
 
-namespace Modules\Payment\Drivers;
+namespace Modules\Payment\Drivers\Upay;
 
-class MYCashDriver extends BasePaymentDriver
+use Modules\Payment\Drivers\BasePaymentDriver;
+
+class UpayDriver extends BasePaymentDriver
 {
     public function initiatePayment(mixed $payment): array
     {

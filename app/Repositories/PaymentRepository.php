@@ -2,20 +2,36 @@
 
 namespace Modules\Payment\Repositories;
 
-use Modules\Payment\Services\Providers\BasePaymentProvider;
+use Modules\Payment\Drivers\BasePaymentDriver;
 
 class PaymentRepository
 {
-    protected $provider;
+    protected BasePaymentDriver $provider;
 
-    public function __construct(BasePaymentProvider $provider)
+    public function __construct(BasePaymentDriver $provider)
     {
         $this->provider = $provider;
     }
 
-    public function initiatePayment(array $data)
+    /**
+     * Get payment details from the payment provider.
+     */
+    public function getPaymentDetails(string $transactionId)
     {
-        return $this->provider->initiatePayment($data);
+        return $this->provider->getPaymentDetails($transactionId);
+    }
+
+    /**
+     * Update the payment status.
+     */
+    public function updatePaymentStatus(string $transactionId, string $status, array $postData): void
+    {
+        $this->provider->updatePaymentStatus($transactionId, $status, $postData);
+    }
+
+    public function initiatePayment(mixed $payment)
+    {
+        return $this->provider->initiatePayment($payment);
     }
 
     public function verifyPayment(string $transactionId)
@@ -23,15 +39,28 @@ class PaymentRepository
         return $this->provider->verifyPayment($transactionId);
     }
 
-    public function refundPayment(string $transactionId, float $amount)
+    public function refundPayment(mixed $payment)
     {
-        return $this->provider->refundPayment($transactionId, $amount);
+        return $this->provider->refundPayment($payment);
     }
 
     public function handleIPN(array $data)
     {
-        if (method_exists($this->provider, 'handleIPN')) {
-            return $this->provider->handleIPN($data);
-        }
+        return $this->provider->handleIPN($data);
+    }
+
+    public function handleSuccess(array $data): array
+    {
+        return $this->provider->handleSuccess($data);
+    }
+
+    public function handleFailure(array $data): array
+    {
+        return $this->provider->handleFailure($data);
+    }
+
+    public function handleCancel(array $data): array
+    {
+        return $this->provider->handleCancel($data);
     }
 }

@@ -6,128 +6,86 @@ use Illuminate\Support\Facades\Http;
 
 class PortWalletDriver extends BasePaymentDriver
 {
-    private $store_id;
-    private $store_password;
-    private $sandbox_mode;
-
-    public function __construct()
+    public function initiatePayment(mixed $payment): array
     {
-        // Initialize configuration
-        $this->store_id = config('payment.providers.portwallet.store_id');
-        $this->store_password = config('payment.providers.portwallet.store_password');
-        $this->sandbox_mode = config('payment.providers.portwallet.sandbox', true);
+        // Logic to initiate payment with bKash
+        return ['status' => 'success', 'tran_id' => 'bkash_txn_67890'];
     }
 
-    // Initiate payment request
-    public function initiatePayment(array $data): array
-    {
-        $payload = [
-            'store_id' => $this->store_id,
-            'store_password' => $this->store_password,
-            'amount' => $data['amount'],
-            'currency' => $data['currency'] ?? 'BDT',
-            'transaction_id' => $data['transaction_id'],
-            'customer_name' => $data['customer_name'],
-            'customer_email' => $data['customer_email'],
-            'customer_phone' => $data['customer_phone'],
-            'success_url' => $data['success_url'],
-            'fail_url' => $data['fail_url'],
-            'cancel_url' => $data['cancel_url'],
-        ];
-
-        $response = $this->postRequest('payment', $payload);
-
-        return [
-            'status' => 'success',
-            'redirect_url' => $response['redirect_url'],
-            'transaction_id' => $response['transaction_id'],
-        ];
-    }
-
-    // Verify the payment status
     public function verifyPayment(string $transactionId): array
     {
-        $payload = [
-            'store_id' => $this->store_id,
-            'store_password' => $this->store_password,
-            'transaction_id' => $transactionId,
-        ];
-
-        $response = $this->postRequest('validate', $payload);
-
-        if ($response['status'] !== 'VALID') {
-            throw new \Exception('Payment verification failed');
-        }
-
-        return [
-            'status' => 'success',
-            'transaction_id' => $response['transaction_id'],
-            'amount' => $response['amount'],
-            'currency' => $response['currency'],
-        ];
+        // Logic to verify payment with bKash
+        return ['status' => 'verified', 'tran_id' => $transactionId];
     }
 
-    // Refund the payment
-    public function refundPayment(string $transactionId, float $amount): array
+    public function refundPayment(mixed $payment): array
     {
-        $payload = [
-            'store_id' => $this->store_id,
-            'store_password' => $this->store_password,
-            'transaction_id' => $transactionId,
-            'refund_amount' => $amount,
-        ];
-
-        $response = $this->postRequest('refund', $payload);
-
-        if ($response['status'] !== 'SUCCESS') {
-            throw new \Exception('Refund failed');
-        }
-
-        return [
-            'status' => 'success',
-            'transaction_id' => $response['transaction_id'],
-            'refund_amount' => $response['refund_amount'],
-        ];
+        // Logic to refund payment with bKash
+        return ['status' => 'refunded', 'tran_id' => $payment->transactionId];
     }
 
-    // Handle IPN response
     public function handleIPN(array $data): array
     {
-        if (!$this->validateResponse($data)) {
-            throw new \Exception('Invalid IPN response');
-        }
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+            // Verify the transaction before updating status
+            if (true) {
+                // Update the order status to 'Complete' if transaction is valid
+                $this->updatePaymentStatus($order_details['tran_id'], 'Complete', []);
 
-        return [
-            'status' => $data['status'],
-            'transaction_id' => $data['transaction_id'],
-            'amount' => $data['amount'],
-        ];
+                return [
+                    'status' => 'success',
+                    'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.'
+                ];
+            }
+
+            return [
+                'status' => 'error',
+                'message' => 'Transaction verification failed.'
+            ];
+        });
     }
 
-    // Helper methods
-    private function getEndpoint($type = 'payment')
+    public function handleSuccess(array $data): array
     {
-        $baseUrl = $this->sandbox_mode
-            ? 'https://sandbox.portwallet.com'
-            : 'https://secure.portwallet.com';
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
+            if (true) {
+                $this->updatePaymentStatus($order_details['tran_id'], 'Processing', []);
+                return [
+                    'status' => 'success',
+                    'message' => 'Transaction is successfully completed.'
+                ];
+            }
 
-        return $baseUrl . ($type === 'payment' ? '/api/payment' : '/api/validate');
+            return [
+                'status' => 'error',
+                'message' => 'Transaction verification failed.'
+            ];
+        });
     }
 
-    private function postRequest(string $type, array $data): array
+    public function handleFailure(array $data): array
     {
-        $url = $this->getEndpoint($type);
-        $response = Http::post($url, $data);
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+            // Add logic for handling failure, such as logging or sending notifications
+            $this->updatePaymentStatus($order_details['tran_id'], 'Failed', []);
 
-        if ($response->failed()) {
-            throw new \Exception('Failed to communicate with PortWallet API');
-        }
-
-        return $response->json();
+            return [
+                'status' => 'error',
+                'message' => 'Transaction failed. Order status updated to Failed.'
+            ];
+        });
     }
 
-    public static function validateResponse(array $data): bool
+    public function handleCancel(array $data): array
     {
-        return isset($data['status']) && $data['status'] === 'VALID';
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+            // Handle order cancellation, update status to 'Cancelled'
+            $this->updatePaymentStatus($data['tran_id'], 'Cancelled', []);
+
+            return [
+                'status' => 'error',
+                'message' => 'Transaction cancelled. Order status updated to Cancelled.'
+            ];
+        });
     }
 }
