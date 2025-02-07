@@ -14,9 +14,9 @@ use Modules\Payment\Http\Controllers\PaymentController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware([])->prefix('v1')->group(function () {
     Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function () {
-        Route::post('make', 'makePayment')->name('make');
+        Route::get('make', 'makePayment')->name('make');
         Route::post('verify/{transactionId}', 'verifyPayment')->name('verify');
         Route::post('refund', 'refundPayment')->name('refund');
         Route::post('discount', 'applyDiscount')->name('discount');

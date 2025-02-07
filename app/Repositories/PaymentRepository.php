@@ -6,61 +6,54 @@ use Modules\Payment\Drivers\BasePaymentDriver;
 
 class PaymentRepository
 {
-    protected BasePaymentDriver $provider;
-
-    public function __construct(BasePaymentDriver $provider)
-    {
-        $this->provider = $provider;
-    }
-
     /**
      * Get payment details from the payment provider.
      */
-    public function getPaymentDetails(string $transactionId)
+    public function getPaymentDetails(BasePaymentDriver $provider, string $transactionId)
     {
-        return $this->provider->getPaymentDetails($transactionId);
+        return $provider->getPaymentDetails($transactionId);
     }
 
     /**
      * Update the payment status.
      */
-    public function updatePaymentStatus(string $transactionId, string $status, array $postData): void
+    public function updatePaymentStatus(BasePaymentDriver $provider, string $transactionId, string $status, array $postData): void
     {
-        $this->provider->updatePaymentStatus($transactionId, $status, $postData);
+        $provider->updatePaymentStatus($transactionId, $status, $postData);
     }
 
-    public function initiatePayment(mixed $payment)
+    public function initiatePayment(BasePaymentDriver $provider, mixed $payment)
     {
-        return $this->provider->initiatePayment($payment);
+        return $provider->initiatePayment($payment);
     }
 
-    public function verifyPayment(string $transactionId)
+    public function verifyPayment(BasePaymentDriver $provider, string $transactionId)
     {
-        return $this->provider->verifyPayment($transactionId);
+        return $provider->verifyPayment($transactionId);
     }
 
-    public function refundPayment(mixed $payment)
+    public function refundPayment(BasePaymentDriver $provider, mixed $payment)
     {
-        return $this->provider->refundPayment($payment);
+        return $provider->refundPayment($payment);
     }
 
-    public function handleIPN(array $data)
+    public function handleIPN(BasePaymentDriver $provider, array $data)
     {
-        return $this->provider->handleIPN($data);
+        return $provider->handleIPN($data);
     }
 
-    public function handleSuccess(array $data): array
+    public function handleSuccess(BasePaymentDriver $provider, array $data): array
     {
-        return $this->provider->handleSuccess($data);
+        return $provider->handleSuccess($data);
     }
 
-    public function handleFailure(array $data): array
+    public function handleFailure(BasePaymentDriver $provider, array $data): array
     {
-        return $this->provider->handleFailure($data);
+        return $provider->handleFailure($data);
     }
 
-    public function handleCancel(array $data): array
+    public function handleCancel(BasePaymentDriver $provider, array $data): array
     {
-        return $this->provider->handleCancel($data);
+        return $provider->handleCancel($data);
     }
 }

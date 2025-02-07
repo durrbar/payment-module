@@ -23,6 +23,7 @@ class SSLCommerzDriver extends BasePaymentDriver
 
     public function initiatePayment(mixed $payment): array
     {
+        dd($payment);
         // Prepare the complete transaction data
         $post_data = $this->preparePaymentData($payment);
 

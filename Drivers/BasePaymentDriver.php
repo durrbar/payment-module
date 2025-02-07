@@ -3,6 +3,7 @@
 namespace Modules\Payment\Drivers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Interfaces\PaymentDriverInterface;
 use Modules\Payment\Models\Payment;
@@ -101,6 +102,37 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
                     'message' => 'Invalid transaction status.'
                 ];
         }
+    }
+
+    /**
+     * Format the initial payment response.
+     *
+     * This method is responsible for formatting the response data after an initial
+     * payment attempt. It logs an error if the payment status indicates a failure.
+     *
+     * @param string $status The status of the payment ('success' or 'error').
+     * @param string|null $redirectURL The URL to redirect to after processing the payment, if applicable.
+     * @param string $message A message detailing the outcome of the payment process.
+     * @param array $response The original response data received from the payment provider.
+     * @param string $provider The name of the payment provider.
+     *
+     * @return array{ status: string, redirectURL: string } An array containing the formatted payment response, including the status,
+     *               redirect URL, message, and any additional data.
+     */
+    public function formatInitialPaymentResponse(string $status, string $redirectURL = null, string $message = 'An error occurred', array $response, string $provider): array
+    {
+        // Log an error if the status is 'error'
+        if ($status === 'error') {
+            Log::error($provider . ' create payment failed', ['response' => $response]);
+        }
+
+        // Return the formatted response
+        return [
+            'status' => $status,
+            'redirectURL' => $redirectURL,
+            'message' => $message,
+            'additionalData' => [],
+        ];
     }
 
 }

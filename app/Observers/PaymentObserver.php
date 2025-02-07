@@ -18,8 +18,10 @@ class PaymentObserver
      */
     public function created(Payment $payment): void
     {
-        // Dispatch the PaymentCreatedEvent
-        event(new PaymentCreatedEvent($payment));
+        // Check if the related order was created via a web request
+        if (app()->bound('web_created_order_' . $payment->order_id)) {
+            event(new PaymentCreatedEvent($payment));
+        }
     }
 
     /**

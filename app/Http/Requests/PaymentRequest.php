@@ -15,9 +15,8 @@ class PaymentRequest extends FormRequest
         return [
             'tran_id' => 'required|string',
             'provider' => [
-                'required',
                 'string',
-                Rule::in(config('payment.providers'))
+                // Rule::in(array_keys(config('payment.providers', [])))
             ]
         ];
     }

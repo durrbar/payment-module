@@ -31,7 +31,7 @@ class PaymentController extends Controller
         return $this->handlePaymentServiceMethod(function () use ($validated) {
             $response = $this->paymentService->initiatePayment(
                 $validated['tran_id'],
-                $validated['provider']
+                $validated['provider'] ?? null
             );
             return response()->json($response, Response::HTTP_OK);
         });

@@ -41,7 +41,6 @@ class PaymentServiceProvider extends ServiceProvider
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
-        $this->app->singleton(InvoiceService::class);
         $this->app->singleton(MultiCurrencyService::class);
         $this->app->singleton(DiscountService::class);
         $this->app->singleton(SubscriptionService::class);

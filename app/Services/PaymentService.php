@@ -35,21 +35,26 @@ class PaymentService
     }
 
     /**
-     * Initiate payment by transaction ID and provider.
+     * Initiates a payment transaction.
+     *
+     * @param string $transactionId The payment transaction ID.
+     * @param string $provider name of payment provider
+     * @return array{ status: string, gatewayRedirectURL: string } The response from the payment gateway.
      */
-    public function initiatePayment(string $transactionId, string $provider): array
+    public function initiatePayment(string $transactionId, ?string $provider = null): array
     {
         // Resolve the payment provider
         $provider = $this->resolveProvider($provider);
-
         // Fetch the payment details using the provider
-        $payment = $this->paymentRepository->getPaymentDetails($transactionId);
-
+        // $payment = $this->paymentRepository->getPaymentDetails($provider, $transactionId);
         // Update if provider changed
-        if ($payment->provider !== $provider && $payment->canChangeProvider()) {
-            $payment->update(['provider' => $provider]);
-        }
-
+        // if ($payment->provider !== $provider && $payment->canChangeProvider()) {
+        //     $payment->update(['provider' => $provider]);
+        // }
+        $payment = [
+            'amount' => '46',
+            'tran_id' => 'hfjyfyjf'
+        ];
         // Initiate payment via the repository
         return $this->paymentRepository->initiatePayment($provider, $payment);
     }
@@ -71,14 +76,12 @@ class PaymentService
     /**
      * Refund payment.
      */
-    public function refundPayment(string $transactionId, float $amount, string $provider): array
+    public function refundPayment(string $transactionId, float $amount, ?string $provider): array
     {
         // Resolve the payment provider
         $provider = $this->resolveProvider($provider);
-
         // Fetch the payment details using the provider
-        $payment = $this->paymentRepository->getPaymentDetails($transactionId);
-
+        $payment = $this->paymentRepository->getPaymentDetails($provider, $transactionId);
         // Refund payment
         return $this->paymentRepository->refundPayment($provider, $payment);
     }
@@ -86,7 +89,7 @@ class PaymentService
     /**
      * Handle IPN (Instant Payment Notification) from the payment provider.
      */
-    public function handleIPN(array $data, string $provider)
+    public function handleIPN(array $data, ?string $provider)
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -100,7 +103,7 @@ class PaymentService
     /**
      * Handle success notification from the payment provider.
      */
-    public function handleSuccess(array $data, string $provider)
+    public function handleSuccess(array $data, ?string $provider)
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -114,7 +117,7 @@ class PaymentService
     /**
      * Handle failure notification from the payment provider.
      */
-    public function handleFailure(array $data, string $provider)
+    public function handleFailure(array $data, ?string $provider)
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -128,7 +131,7 @@ class PaymentService
     /**
      * Handle cancel notification from the payment provider.
      */
-    public function handleCancel(array $data, string $provider)
+    public function handleCancel(array $data, ?string $provider)
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -152,7 +155,7 @@ class PaymentService
     /**
      * Resolve the correct payment provider.
      */
-    protected function resolveProvider(string $providerName)
+    protected function resolveProvider(string $providerName = null)
     {
         if (!$providerName) {
             // Fetch the default provider if none is supplied
@@ -161,11 +164,9 @@ class PaymentService
 
         // Fetch the provider configuration dynamically from the config file
         $driver = config('payment.providers.' . strtolower($providerName) . '.driver');
-
         if (!$driver) {
             throw new InvalidProviderException("Driver for provider '{$providerName}' is not defined in the configuration.");
         }
-
         // Return the resolved driver instance
         return app($driver);
     }
