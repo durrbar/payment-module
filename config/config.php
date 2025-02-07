@@ -32,12 +32,6 @@ return [
             'cancel_url' => '/cancel',
             'ipn_url' => '/ipn',
         ],
-        'bkash' => [
-            'driver' => \Modules\Payment\Drivers\BkashDriver::class,
-            'app_key' => env('BKASH_APP_KEY'),
-            'app_secret' => env('BKASH_APP_SECRET'),
-            'sandbox' => env('BKASH_SANDBOX', true),
-        ],
         'nagad' => [
             'driver' => \Modules\Payment\Drivers\Nagad\NagadDriver::class,
             'sandbox' => env('NAGAD_SANDBOX', true),
