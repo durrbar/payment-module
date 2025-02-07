@@ -21,7 +21,10 @@
     "autoload": {
         "psr-4": {
             "Modules\\Payment\\": "app/",
+<<<<<<< HEAD
             "Modules\\Payment\\Drivers\\": "Drivers/",
+=======
+>>>>>>> 722ca003deb3b7897b1cfba9abf06ada32a3e620
             "Modules\\Payment\\Database\\Factories\\": "database/factories/",
             "Modules\\Payment\\Database\\Seeders\\": "database/seeders/"
         }
