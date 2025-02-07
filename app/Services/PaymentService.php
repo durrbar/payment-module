@@ -160,7 +160,7 @@ class PaymentService
         }
 
         // Fetch the provider configuration dynamically from the config file
-        $driver = config('payment.gateways.' . strtolower($providerName) . '.driver');
+        $driver = config('payment.providers.' . strtolower($providerName) . '.driver');
 
         if (!$driver) {
             throw new InvalidProviderException("Driver for provider '{$providerName}' is not defined in the configuration.");
