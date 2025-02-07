@@ -1,5 +1,7 @@
 <?php
 
+namespace Modules\Payment\Drivers\Nagad;
+
 use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Models\Payment;
 

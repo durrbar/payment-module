@@ -1,5 +1,5 @@
 <?php
-namespace Modules\Payment\Drivers\SslCommerz;
+namespace Modules\Payment\Drivers\SSLCommerz;
 
 interface SslCommerzInterface
 {

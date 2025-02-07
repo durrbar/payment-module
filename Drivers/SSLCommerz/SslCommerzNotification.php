@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Payment\Drivers\SslCommerz;
+namespace Modules\Payment\Drivers\SSLCommerz;
 
 class SslCommerzNotification extends AbstractSslCommerz
 {
