@@ -149,7 +149,7 @@ class PaymentService
      */
     private function generateTransactionId(): string
     {
-        return 'TXN-' . strtoupper(uniqid());
+        return 'TXN-' . now()->format('Ymd') . strtoupper(bin2hex(random_bytes(4)));
     }
 
     /**
