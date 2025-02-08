@@ -28,4 +28,12 @@ class PaymentRequest extends FormRequest
     {
         return true;
     }
+
+    public function messages(): array
+    {
+        return [
+            'provider.in' => "Driver for provider ':input' is not defined in the configuration.",
+        ];
+    }
+
 }
