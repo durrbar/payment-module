@@ -5,7 +5,7 @@ namespace Modules\Payment\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Modules\Payment\Models\Payment;
 
-class PaymentCreatedEvent
+class PaymentRefundedEvent
 {
     use Dispatchable;
 

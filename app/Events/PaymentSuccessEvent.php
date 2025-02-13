@@ -2,14 +2,12 @@
 
 namespace Modules\Payment\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 use Modules\Payment\Models\Payment;
 
 class PaymentSuccessEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
 
     public Payment $payment;
 

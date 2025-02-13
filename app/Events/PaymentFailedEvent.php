@@ -2,12 +2,12 @@
 
 namespace Modules\Payment\Events;
 
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
 use Modules\Order\Models\Order;
 
 class PaymentFailedEvent
 {
-    use SerializesModels;
+    use Dispatchable;
 
     public Order $order;
 
