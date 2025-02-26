@@ -13,7 +13,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
     /**
      * Fetch payment details by transaction ID.
      */
-    public function getPaymentDetails(string $tranId): mixed
+    public function getPaymentDetails(string $tranId): Payment
     {
         return Payment::where('tran_id', $tranId)
             ->select('tran_id', 'status', 'currency', 'amount')
@@ -31,11 +31,15 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
                 [
                     'amount' => $data['total_amount'],
                     'status' => $status,
-                    'tran_id' => $tranId,
                     'currency' => $data['currency'],
                 ]
             );
         });
+    }
+
+    public function updatePayment(Payment $payment, $data): void
+    {
+        $payment->update($data);
     }
 
     /**

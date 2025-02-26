@@ -2,6 +2,7 @@
 
 namespace Modules\Payment\Providers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\Payment\Services\DiscountService;
@@ -31,6 +32,10 @@ class PaymentServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        Relation::enforceMorphMap([
+            'payment' => 'Modules\Payment\Models\Payment',
+        ]);
     }
 
     /**

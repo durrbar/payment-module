@@ -3,13 +3,14 @@
 namespace Modules\Payment\Repositories;
 
 use Modules\Payment\Drivers\BasePaymentDriver;
+use Modules\Payment\Models\Payment;
 
 class PaymentRepository
 {
     /**
      * Get payment details from the payment provider.
      */
-    public function getPaymentDetails(BasePaymentDriver $provider, string $transactionId)
+    public function getPaymentDetails(BasePaymentDriver $provider, string $transactionId): Payment
     {
         return $provider->getPaymentDetails($transactionId);
     }
