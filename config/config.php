@@ -1,7 +1,5 @@
 <?php
 
-$apiDomainSSLCZ = env('SSLCOMMERZ_SANDBOX') ? "https://sandbox.sslcommerz.com" : "https://securepay.sslcommerz.com";
-
 return [
     'name' => 'Payment',
 

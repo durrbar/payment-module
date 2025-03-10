@@ -46,15 +46,15 @@ class PaymentService
         // Resolve the payment provider
         $provider = $this->resolveProvider($provider);
         // Fetch the payment details using the provider
-        $payment = $this->paymentRepository->getPaymentDetails($provider, $transactionId);
-        // Update if provider changed
-        if ($payment->provider !== $provider && $payment->canChangeProvider()) {
-            $payment->update(['provider' => $provider]);
-        }
-        // $payment = [
-        //     'amount' => '46',
-        //     'tran_id' => 'hfjyfyjf'
-        // ];
+        // $payment = $this->paymentRepository->getPaymentDetails($provider, $transactionId);
+        // // Update if provider changed
+        // if ($payment->provider !== $provider && $payment->canChangeProvider()) {
+        //     $payment->update(['provider' => $provider]);
+        // }
+        $payment = [
+            'amount' => '46',
+            'tran_id' => 'hfjyfyjf'
+        ];
         // Initiate payment via the repository
         return $this->paymentRepository->initiatePayment($provider, $payment);
     }
