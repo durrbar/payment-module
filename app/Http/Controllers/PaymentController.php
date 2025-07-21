@@ -33,6 +33,7 @@ class PaymentController extends Controller
                 $validated['tran_id'],
                 $validated['provider'] ?? null
             );
+
             return response()->json($response, Response::HTTP_OK);
         });
     }
@@ -44,6 +45,7 @@ class PaymentController extends Controller
     {
         return $this->handlePaymentServiceMethod(function () use ($transactionId, $request) {
             $response = $this->paymentService->verifyPayment($transactionId, $request->input('provider'));
+
             return response()->json($response, Response::HTTP_OK);
         });
     }
@@ -61,6 +63,7 @@ class PaymentController extends Controller
                 $validated['amount'],
                 $validated['provider']
             );
+
             return response()->json($response, Response::HTTP_OK);
         });
     }
@@ -79,7 +82,7 @@ class PaymentController extends Controller
             );
 
             return response()->json([
-                'discounted_amount' => $discountedAmount
+                'discounted_amount' => $discountedAmount,
             ], Response::HTTP_OK);
         });
     }
@@ -91,6 +94,7 @@ class PaymentController extends Controller
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleIPN($request->all(), $provider);
+
             return response()->json($response);
         });
     }
@@ -102,6 +106,7 @@ class PaymentController extends Controller
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleSuccess($request->all(), $provider);
+
             return response()->json($response);
         });
     }
@@ -113,6 +118,7 @@ class PaymentController extends Controller
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleFailure($request->all(), $provider);
+
             return response()->json($response);
         });
     }
@@ -124,6 +130,7 @@ class PaymentController extends Controller
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleCancel($request->all(), $provider);
+
             return response()->json($response);
         });
     }
@@ -137,6 +144,7 @@ class PaymentController extends Controller
             return $method();
         } catch (Exception $e) {
             Log::error($e->getMessage());
+
             return response()->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }

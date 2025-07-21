@@ -2,8 +2,6 @@
 
 namespace Modules\Payment\Drivers;
 
-use Illuminate\Support\Facades\Http;
-
 class PortWalletDriver extends BasePaymentDriver
 {
     public function initiatePayment(mixed $payment): array
@@ -26,7 +24,7 @@ class PortWalletDriver extends BasePaymentDriver
 
     public function handleIPN(array $data): array
     {
-        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
             // Verify the transaction before updating status
             if (true) {
                 // Update the order status to 'Complete' if transaction is valid
@@ -34,13 +32,13 @@ class PortWalletDriver extends BasePaymentDriver
 
                 return [
                     'status' => 'success',
-                    'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.'
+                    'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.',
                 ];
             }
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction verification failed.'
+                'message' => 'Transaction verification failed.',
             ];
         });
     }
@@ -50,28 +48,29 @@ class PortWalletDriver extends BasePaymentDriver
         return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
             if (true) {
                 $this->updatePaymentStatus($order_details['tran_id'], 'Processing', []);
+
                 return [
                     'status' => 'success',
-                    'message' => 'Transaction is successfully completed.'
+                    'message' => 'Transaction is successfully completed.',
                 ];
             }
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction verification failed.'
+                'message' => 'Transaction verification failed.',
             ];
         });
     }
 
     public function handleFailure(array $data): array
     {
-        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
             // Add logic for handling failure, such as logging or sending notifications
             $this->updatePaymentStatus($order_details['tran_id'], 'Failed', []);
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction failed. Order status updated to Failed.'
+                'message' => 'Transaction failed. Order status updated to Failed.',
             ];
         });
     }
@@ -84,7 +83,7 @@ class PortWalletDriver extends BasePaymentDriver
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction cancelled. Order status updated to Cancelled.'
+                'message' => 'Transaction cancelled. Order status updated to Cancelled.',
             ];
         });
     }

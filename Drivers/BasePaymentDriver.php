@@ -25,7 +25,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
      */
     public function updatePaymentStatus(string $tranId, string $status, array $data): void
     {
-        DB::transaction(function () use ($tranId, $status, $data) {
+        DB::transaction(function () use ($tranId, $status, $data): void {
             Payment::updateOrInsert(
                 ['tran_id' => $tranId],
                 [
@@ -51,7 +51,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
         if (empty($tranId) || empty($status)) {
             return [
                 'status' => 'error',
-                'message' => 'Invalid payment ID or status.'
+                'message' => 'Invalid payment ID or status.',
             ];
         }
 
@@ -59,13 +59,13 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
         $paymentDetails = $this->getPaymentDetails($tranId);
 
         // If payment details not found, log and return error
-        if (!$paymentDetails) {
+        if (! $paymentDetails) {
             // Log error for debugging
             error_log("Payment not found for ID: $tranId");
 
             return [
                 'status' => 'error',
-                'message' => 'Payment not found.'
+                'message' => 'Payment not found.',
             ];
         }
 
@@ -76,11 +76,11 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
                 return $next($paymentDetails);
             } catch (\Exception $e) {
                 // Log callback exception
-                error_log("Callback execution failed: " . $e->getMessage());
+                error_log('Callback execution failed: '.$e->getMessage());
 
                 return [
                     'status' => 'error',
-                    'message' => 'An error occurred during callback execution.'
+                    'message' => 'An error occurred during callback execution.',
                 ];
             }
         }
@@ -90,20 +90,20 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
             case PaymentStatus::PROCESSING:
                 return [
                     'status' => 'error',
-                    'message' => 'Transaction is already being processed.'
+                    'message' => 'Transaction is already being processed.',
                 ];
             case PaymentStatus::COMPLETED:
                 return [
                     'status' => 'error',
-                    'message' => 'Transaction is already successfully completed.'
+                    'message' => 'Transaction is already successfully completed.',
                 ];
             default:
                 // Log unexpected status
-                error_log("Unexpected payment status: " . $paymentDetails->status);
+                error_log('Unexpected payment status: '.$paymentDetails->status);
 
                 return [
                     'status' => 'error',
-                    'message' => 'Invalid transaction status.'
+                    'message' => 'Invalid transaction status.',
                 ];
         }
     }
@@ -114,20 +114,19 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
      * This method is responsible for formatting the response data after an initial
      * payment attempt. It logs an error if the payment status indicates a failure.
      *
-     * @param string $status The status of the payment ('success' or 'error').
-     * @param string|null $redirectURL The URL to redirect to after processing the payment, if applicable.
-     * @param string $message A message detailing the outcome of the payment process.
-     * @param array $response The original response data received from the payment provider.
-     * @param string $provider The name of the payment provider.
-     *
+     * @param  string  $status  The status of the payment ('success' or 'error').
+     * @param  string|null  $redirectURL  The URL to redirect to after processing the payment, if applicable.
+     * @param  string  $message  A message detailing the outcome of the payment process.
+     * @param  array  $response  The original response data received from the payment provider.
+     * @param  string  $provider  The name of the payment provider.
      * @return array{ status: string, redirectURL: string } An array containing the formatted payment response, including the status,
-     *               redirect URL, message, and any additional data.
+     *                                                      redirect URL, message, and any additional data.
      */
-    public function formatInitialPaymentResponse(string $status, string $redirectURL = null, string $message = 'An error occurred', array $response, string $provider): array
+    public function formatInitialPaymentResponse(string $status, ?string $redirectURL, string $message, array $response, string $provider): array
     {
         // Log an error if the status is 'error'
         if ($status === 'error') {
-            Log::error($provider . ' create payment failed', ['response' => $response]);
+            Log::error($provider.' create payment failed', ['response' => $response]);
         }
 
         // Return the formatted response
@@ -138,5 +137,4 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
             'additionalData' => [],
         ];
     }
-
 }

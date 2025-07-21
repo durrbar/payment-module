@@ -6,18 +6,23 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Modules\Payment\Drivers\BasePaymentDriver;
 use Modules\Payment\Drivers\Nagad\Exceptions\NagadException;
-use Modules\Payment\Drivers\Nagad\NagadHelpers;
 
 class NagadDriver extends BasePaymentDriver
 {
     use NagadHelpers;
 
     private string $merchantId;
+
     private string $merchantNumber;
+
     private string $baseUrl;
+
     private string $callbackUrl;
+
     private string $privateKey;
+
     private string $publicKey;
+
     private bool $sandbox_mode;
 
     public function __construct()
@@ -38,16 +43,16 @@ class NagadDriver extends BasePaymentDriver
         $this->validatePayment($payment);
 
         // Initiate the payment
-        $paymentResponse  = $this->createPayment($payment['amount'], $payment['tran_id']);
+        $paymentResponse = $this->createPayment($payment['amount'], $payment['tran_id']);
 
         // Return the payment options or an empty array
-        return is_array($paymentResponse ) ? $paymentResponse  : [];
+        return is_array($paymentResponse) ? $paymentResponse : [];
     }
 
     public function verifyPayment(string $transactionId): array
     {
-        if (!$transactionId) {
-            return $this->errorResponse("Transaction ID not provided");
+        if (! $transactionId) {
+            return $this->errorResponse('Transaction ID not provided');
         }
 
         // Send the request to verify the payment
@@ -82,7 +87,7 @@ class NagadDriver extends BasePaymentDriver
 
     public function handleIPN(array $data): array
     {
-        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($details) use ($data) {
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($details) {
             // Verify the transaction before updating status
             if ($this->verifyTransaction($details['tran_id'])) {
                 // Update the order status to 'Complete' if transaction is valid
@@ -90,13 +95,13 @@ class NagadDriver extends BasePaymentDriver
 
                 return [
                     'status' => 'success',
-                    'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.'
+                    'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.',
                 ];
             }
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction verification failed.'
+                'message' => 'Transaction verification failed.',
             ];
         });
     }
@@ -106,28 +111,29 @@ class NagadDriver extends BasePaymentDriver
         return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
             if ($this->verifyTransaction($order_details['tran_id'])) {
                 $this->updatePaymentStatus($order_details['tran_id'], 'Processing', []);
+
                 return [
                     'status' => 'success',
-                    'message' => 'Transaction is successfully completed.'
+                    'message' => 'Transaction is successfully completed.',
                 ];
             }
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction verification failed.'
+                'message' => 'Transaction verification failed.',
             ];
         });
     }
 
     public function handleFailure(array $data): array
     {
-        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) use ($data) {
+        return $this->processPaymentStatus($data['tran_id'], 'Pending', function ($order_details) {
             // Add logic for handling failure, such as logging or sending notifications
             $this->updatePaymentStatus($order_details['tran_id'], 'Failed', []);
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction failed. Order status updated to Failed.'
+                'message' => 'Transaction failed. Order status updated to Failed.',
             ];
         });
     }
@@ -140,7 +146,7 @@ class NagadDriver extends BasePaymentDriver
 
             return [
                 'status' => 'error',
-                'message' => 'Transaction cancelled. Order status updated to Cancelled.'
+                'message' => 'Transaction cancelled. Order status updated to Cancelled.',
             ];
         });
     }
@@ -157,14 +163,14 @@ class NagadDriver extends BasePaymentDriver
         $initialize = $this->initializePayment($invoice);
 
         if ($initialize->sensitiveData && $initialize->signature) {
-            $decryptData        = json_decode($this->decryptDataPrivateKey($initialize->sensitiveData));
-            $url                = $this->baseUrl . "/check-out/complete/" . $decryptData->paymentReferenceId;
+            $decryptData = json_decode($this->decryptDataPrivateKey($initialize->sensitiveData));
+            $url = $this->baseUrl.'/check-out/complete/'.$decryptData->paymentReferenceId;
             $sensitiveOrderData = [
-                'merchantId'   => $this->merchantId,
-                'orderId'      => $invoice,
+                'merchantId' => $this->merchantId,
+                'orderId' => $invoice,
                 'currencyCode' => '050',
-                'amount'       => $amount,
-                'challenge'    => $decryptData->challenge
+                'amount' => $amount,
+                'challenge' => $decryptData->challenge,
             ];
 
             return $this->sendPaymentRequest($url, $sensitiveOrderData);
@@ -173,13 +179,13 @@ class NagadDriver extends BasePaymentDriver
 
     private function initializePayment($invoice)
     {
-        $baseUrl       = $this->baseUrl . "check-out/initialize/{$this->merchantId}/{$invoice}";
+        $baseUrl = $this->baseUrl."check-out/initialize/{$this->merchantId}/{$invoice}";
         $sensitiveData = $this->getSensitiveData($invoice);
-        $body          = [
-            "accountNumber" => $this->merchantNumber,
-            "dateTime"      => Carbon::now()->timezone(config("timezone"))->format('YmdHis'),
-            "sensitiveData" => $this->encryptWithPublicKey(json_encode($sensitiveData)),
-            'signature'     => $this->signatureGenerate(json_encode($sensitiveData)),
+        $body = [
+            'accountNumber' => $this->merchantNumber,
+            'dateTime' => Carbon::now()->timezone(config('timezone'))->format('YmdHis'),
+            'sensitiveData' => $this->encryptWithPublicKey(json_encode($sensitiveData)),
+            'signature' => $this->signatureGenerate(json_encode($sensitiveData)),
         ];
 
         $response = $this->sendRequest($baseUrl, $body);
@@ -194,15 +200,15 @@ class NagadDriver extends BasePaymentDriver
     private function sendPaymentRequest(string $url, array $sensitiveOrderData)
     {
         $response = $this->sendRequest($url, [
-                'sensitiveData'       => $this->encryptWithPublicKey(json_encode($sensitiveOrderData)),
-                'signature'           => $this->signatureGenerate(json_encode($sensitiveOrderData)),
-                'merchantCallbackURL' => $this->callbackUrl,
-            ]);
+            'sensitiveData' => $this->encryptWithPublicKey(json_encode($sensitiveOrderData)),
+            'signature' => $this->signatureGenerate(json_encode($sensitiveOrderData)),
+            'merchantCallbackURL' => $this->callbackUrl,
+        ]);
 
         return json_decode($response->body());
     }
 
-    private function refund(string $paymentRefId, float $refundAmount, string $referenceNo = "", string $message = "Requested for refund")
+    private function refund(string $paymentRefId, float $refundAmount, string $referenceNo = '', string $message = 'Requested for refund')
     {
         $paymentDetails = $this->verifyTransaction($paymentRefId);
 
@@ -215,18 +221,18 @@ class NagadDriver extends BasePaymentDriver
         }
 
         $sensitiveOrderData = [
-            'merchantId'          => $this->merchantId,
-            "originalRequestDate" => date("Ymd"),
-            'originalAmount'      => $paymentDetails->amount,
-            'cancelAmount'        => $refundAmount,
-            'referenceNo'         => $referenceNo,
-            'referenceMessage'    => $message,
+            'merchantId' => $this->merchantId,
+            'originalRequestDate' => date('Ymd'),
+            'originalAmount' => $paymentDetails->amount,
+            'cancelAmount' => $refundAmount,
+            'referenceNo' => $referenceNo,
+            'referenceMessage' => $message,
         ];
 
-        $response = $this->sendRequest($this->baseUrl . "purchase/cancel?paymentRefId={$paymentDetails->paymentRefId}&orderId={$paymentDetails->orderId}", [
-                "sensitiveDataCancelRequest" => $this->encryptWithPublicKey(json_encode($sensitiveOrderData)),
-                "signature"                  => $this->signatureGenerate(json_encode($sensitiveOrderData))
-            ]);
+        $response = $this->sendRequest($this->baseUrl."purchase/cancel?paymentRefId={$paymentDetails->paymentRefId}&orderId={$paymentDetails->orderId}", [
+            'sensitiveDataCancelRequest' => $this->encryptWithPublicKey(json_encode($sensitiveOrderData)),
+            'signature' => $this->signatureGenerate(json_encode($sensitiveOrderData)),
+        ]);
 
         $responseData = json_decode($response->body());
 
@@ -239,7 +245,7 @@ class NagadDriver extends BasePaymentDriver
 
     private function verifyTransaction(string $paymentRefId)
     {
-        $url      = $this->baseUrl . "verify/payment/{$paymentRefId}";
+        $url = $this->baseUrl."verify/payment/{$paymentRefId}";
         $response = Http::withHeaders($this->headers())->get($url);
 
         return json_decode($response->body());
@@ -248,7 +254,7 @@ class NagadDriver extends BasePaymentDriver
     private function errorResponse(string $message): array
     {
         return [
-            "error" => $message
+            'error' => $message,
         ];
     }
 
@@ -260,16 +266,16 @@ class NagadDriver extends BasePaymentDriver
     protected function headers()
     {
         return [
-            "Content-Type"     => "application/json",
-            "X-KM-IP-V4"       => $this->getIp(),
-            "X-KM-Api-Version" => "v-0.2.0",
-            "X-KM-Client-Type" => "PC_WEB"
+            'Content-Type' => 'application/json',
+            'X-KM-IP-V4' => $this->getIp(),
+            'X-KM-Api-Version' => 'v-0.2.0',
+            'X-KM-Client-Type' => 'PC_WEB',
         ];
     }
 
     private function validatePayment(array $payment): void
     {
-        if (!isset($payment['tran_id'], $payment['amount'])) {
+        if (! isset($payment['tran_id'], $payment['amount'])) {
             throw new NagadException('Invalid payment data');
         }
 

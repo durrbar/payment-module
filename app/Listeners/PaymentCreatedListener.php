@@ -12,8 +12,6 @@ class PaymentCreatedListener
 
     /**
      * Create the event listener.
-     *
-     * @param PaymentService $paymentService
      */
     public function __construct(PaymentService $paymentService)
     {
@@ -32,7 +30,7 @@ class PaymentCreatedListener
         event(new PaymentCreatedBroadcastEvent(
             $event->payment->order->customer->id,
             $event->payment->order->id,
-            env('FRONTEND_URL') . '/payment/' . $event->payment->tran_id
+            env('FRONTEND_URL').'/payment/'.$event->payment->tran_id
         ));
     }
 }

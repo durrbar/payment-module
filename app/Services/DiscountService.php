@@ -8,17 +8,13 @@ class DiscountService
 {
     /**
      * Apply and calculate discount for a given code and amount.
-     *
-     * @param string $code
-     * @param float $amount
-     * @return array
      */
     public function applyDiscount(string $code, float $amount): array
     {
         // Try to fetch the discount from the database
         $discount = Discount::where('code', $code)->first();
 
-        if (!$discount || !$discount->isValid()) {
+        if (! $discount || ! $discount->isValid()) {
             return [
                 'status' => 'error',
                 'message' => 'Invalid or expired discount code.',

@@ -29,7 +29,7 @@ trait Helpers
             'datetime' => $this->currentDateTime(),
             'orderId' => $payment->tran_id,
             'amount' => number_format($payment->amount, 2, '.', ''),
-            'callbackUrl' => $this->callbackUrl
+            'callbackUrl' => $this->callbackUrl,
         ]);
 
         return $this->rsaEncrypt($data, $this->publicKey);
@@ -37,13 +37,15 @@ trait Helpers
 
     protected function generateSignature(Payment $payment): string
     {
-        $data = $payment->tran_id . $this->currentDateTime() . $payment->amount;
+        $data = $payment->tran_id.$this->currentDateTime().$payment->amount;
+
         return $this->hmacHash($data, $this->privateKey);
     }
 
     protected function rsaEncrypt(string $data, string $publicKey): string
     {
         openssl_public_encrypt($data, $encrypted, $publicKey);
+
         return base64_encode($encrypted);
     }
 
@@ -54,7 +56,7 @@ trait Helpers
 
     protected function validatePaymentObject(mixed $payment): void
     {
-        if (!$payment instanceof Payment) {
+        if (! $payment instanceof Payment) {
             throw new \InvalidArgumentException('Invalid payment object type');
         }
 
@@ -75,7 +77,7 @@ trait Helpers
             'status' => PaymentStatus::PENDING,
             'payment_id' => $response['paymentReferenceId'],
             'redirect_url' => $response['callBackUrl'],
-            'qr_code' => $response['qrCode'] ?? null
+            'qr_code' => $response['qrCode'] ?? null,
         ];
     }
 
@@ -91,7 +93,7 @@ trait Helpers
             'status' => PaymentStatus::COMPLETED,
             'transaction_id' => $response['paymentReferenceId'],
             'amount' => $response['amount'],
-            'currency' => 'BDT'
+            'currency' => 'BDT',
         ];
     }
 
@@ -99,7 +101,7 @@ trait Helpers
     {
         $required = ['payment_ref_id', 'status', 'amount'];
         foreach ($required as $key) {
-            if (!isset($data[$key])) {
+            if (! isset($data[$key])) {
                 throw new \Exception("Missing IPN field: {$key}");
             }
         }

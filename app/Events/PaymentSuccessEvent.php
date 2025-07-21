@@ -14,7 +14,7 @@ class PaymentSuccessEvent
     /**
      * Create a new event instance.
      *
-     * @param Payment $order
+     * @param  Payment  $order
      */
     public function __construct(Payment $payment)
     {

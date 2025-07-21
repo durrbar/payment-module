@@ -14,13 +14,13 @@ use Modules\Payment\Http\Controllers\PaymentController;
  *
 */
 
-Route::middleware([])->prefix('v1')->group(function () {
-    Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function () {
+Route::middleware([])->prefix('v1')->group(function (): void {
+    Route::prefix('payment')->name('payment.')->controller(PaymentController::class)->group(function (): void {
         Route::get('make', 'makePayment')->name('make');
         Route::post('verify/{transactionId}', 'verifyPayment')->name('verify');
         Route::post('refund', 'refundPayment')->name('refund');
         Route::post('discount', 'applyDiscount')->name('discount');
-        Route::withoutMiddleware(['auth:sanctum'])->group(function () {
+        Route::withoutMiddleware(['auth:sanctum'])->group(function (): void {
             Route::post('ipn/{provider}', 'ipn')->name('ipn');
             Route::post('success/{provider}', 'success')->name('success');
             Route::post('fail/{provider}', 'fail')->name('fail');

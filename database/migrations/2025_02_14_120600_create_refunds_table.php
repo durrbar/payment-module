@@ -10,9 +10,9 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('refunds', function (Blueprint $table) {
+        Schema::create('old_refunds', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('payment_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('old_payment_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
             $table->string('status', 20); // e.g., 'pending', 'approved', 'rejected'
             $table->text('reason')->nullable(); // Reason for the refund

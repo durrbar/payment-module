@@ -29,7 +29,7 @@ class SubscriptionService
 
     public function subscribe(string $plan, string $userId): array
     {
-        if (!isset($this->plans[$plan])) {
+        if (! isset($this->plans[$plan])) {
             return [
                 'status' => 'error',
                 'message' => 'Invalid subscription plan',

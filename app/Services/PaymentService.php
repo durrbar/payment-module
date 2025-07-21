@@ -21,8 +21,6 @@ class PaymentService
     /**
      * Create a payment record for an order.
      *
-     * @param Order $order
-     * @return Payment
      * @throws Exception
      */
     public function createPayment(Order $order): Payment
@@ -37,8 +35,8 @@ class PaymentService
     /**
      * Initiates a payment transaction.
      *
-     * @param string $transactionId The payment transaction ID.
-     * @param string $provider name of payment provider
+     * @param  string  $transactionId  The payment transaction ID.
+     * @param  string  $provider  name of payment provider
      * @return array{ status: string, gatewayRedirectURL: string } The response from the payment gateway.
      */
     public function initiatePayment(string $transactionId, ?string $provider = null): array
@@ -53,8 +51,9 @@ class PaymentService
         // }
         $payment = [
             'amount' => '46',
-            'tran_id' => 'hfjyfyjf'
+            'tran_id' => 'hfjyfyjf',
         ];
+
         // Initiate payment via the repository
         return $this->paymentRepository->initiatePayment($provider, $payment);
     }
@@ -66,9 +65,10 @@ class PaymentService
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
+
             return $this->paymentRepository->verifyPayment($providerInstance, $transactionId);
         } catch (\Exception $e) {
-            Log::error("Payment verification failed for transaction {$transactionId}: " . $e->getMessage());
+            Log::error("Payment verification failed for transaction {$transactionId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -82,6 +82,7 @@ class PaymentService
         $provider = $this->resolveProvider($provider);
         // Fetch the payment details using the provider
         $payment = $this->paymentRepository->getPaymentDetails($provider, $transactionId);
+
         // Refund payment
         return $this->paymentRepository->refundPayment($provider, $payment);
     }
@@ -93,9 +94,10 @@ class PaymentService
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
+
             return $this->paymentRepository->handleIPN($providerInstance, $data);
         } catch (\Exception $e) {
-            Log::error("IPN handling failed for $provider: " . $e->getMessage());
+            Log::error("IPN handling failed for $provider: ".$e->getMessage());
             throw $e;
         }
     }
@@ -107,9 +109,10 @@ class PaymentService
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
+
             return $this->paymentRepository->handleSuccess($providerInstance, $data);
         } catch (\Exception $e) {
-            Log::error("Success handling failed for $provider: " . $e->getMessage());
+            Log::error("Success handling failed for $provider: ".$e->getMessage());
             throw $e;
         }
     }
@@ -121,9 +124,10 @@ class PaymentService
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
+
             return $this->paymentRepository->handleFailure($providerInstance, $data);
         } catch (\Exception $e) {
-            Log::error("Failure handling failed for $provider: " . $e->getMessage());
+            Log::error("Failure handling failed for $provider: ".$e->getMessage());
             throw $e;
         }
     }
@@ -135,38 +139,38 @@ class PaymentService
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
+
             return $this->paymentRepository->handleCancel($providerInstance, $data);
         } catch (\Exception $e) {
-            Log::error("Cancel handling failed for $provider: " . $e->getMessage());
+            Log::error("Cancel handling failed for $provider: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Generate a unique transaction ID.
-     *
-     * @return string
      */
     private function generateTransactionId(): string
     {
-        return 'TXN-' . now()->format('Ymd') . strtoupper(bin2hex(random_bytes(4)));
+        return 'TXN-'.now()->format('Ymd').strtoupper(bin2hex(random_bytes(4)));
     }
 
     /**
      * Resolve the correct payment provider.
      */
-    protected function resolveProvider(string $providerName = null)
+    protected function resolveProvider(?string $providerName = null)
     {
-        if (!$providerName) {
+        if (! $providerName) {
             // Fetch the default provider if none is supplied
             $providerName = config('payment.defaults.provider');
         }
 
         // Fetch the provider configuration dynamically from the config file
-        $driver = config('payment.providers.' . strtolower($providerName) . '.driver');
-        if (!$driver) {
+        $driver = config('payment.providers.'.strtolower($providerName).'.driver');
+        if (! $driver) {
             throw new InvalidProviderException("Driver for provider '{$providerName}' is not defined in the configuration.");
         }
+
         // Return the resolved driver instance
         return app($driver);
     }

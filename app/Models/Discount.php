@@ -2,8 +2,9 @@
 
 namespace Modules\Payment\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
 // use Modules\Payment\Database\Factories\DiscountFactory;
 
 class Discount extends Model
@@ -22,13 +23,11 @@ class Discount extends Model
 
     /**
      * Check if the discount is valid.
-     *
-     * @return bool
      */
     public function isValid(): bool
     {
         // Check if the discount is active
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
