@@ -2,6 +2,7 @@
 
 namespace Modules\Payment\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,6 +10,7 @@ use Modules\Ecommerce\Traits\TranslationTrait;
 
 class PaymentMethod extends Model
 {
+    use HasUuids;
     use SoftDeletes;
     use TranslationTrait;
 
