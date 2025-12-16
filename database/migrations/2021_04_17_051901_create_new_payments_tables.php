@@ -59,8 +59,8 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('payment_gateways');
         Schema::dropIfExists('payment_methods');
+        Schema::dropIfExists('payment_gateways');
         Schema::dropIfExists('payment_intents');
     }
 };
