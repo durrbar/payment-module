@@ -11,11 +11,9 @@ use Modules\Payment\Repositories\PaymentRepository;
 
 class PaymentService
 {
-    protected PaymentRepository $paymentRepository;
-
-    public function __construct(PaymentRepository $paymentRepository)
+    public function __construct(protected PaymentRepository $paymentRepository)
     {
-        $this->paymentRepository = $paymentRepository;
+        //
     }
 
     /**

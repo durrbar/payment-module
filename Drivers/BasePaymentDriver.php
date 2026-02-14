@@ -4,7 +4,7 @@ namespace Modules\Payment\Drivers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld as PaymentStatus;
 use Modules\Payment\Interfaces\PaymentDriverInterface;
 use Modules\Payment\Models\Payment;
 
