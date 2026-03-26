@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -14,10 +17,9 @@ return new class () extends Migration {
     {
         Schema::create('payment_gateways', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->uuid('user_id');
             $table->string('customer_id');
             $table->string('gateway_name')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,7 +27,6 @@ return new class () extends Migration {
         Schema::create('payment_methods', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('method_key')->unique();
-            $table->uuid('payment_gateway_id')->nullable();
             $table->boolean('default_card')->nullable()->default(false);
             $table->string('fingerprint')->unique();
             $table->string('owner_name')->nullable();
@@ -35,18 +36,17 @@ return new class () extends Migration {
             $table->string('expires')->nullable();
             $table->string('origin')->nullable();
             $table->string('verification_check')->nullable();
-            $table->foreign('payment_gateway_id')->references('id')->on('payment_gateways')->onDelete('cascade');
+            $table->foreignUuid('payment_gateway_id')->nullable()->constrained()->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });
 
         Schema::create('payment_intents', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->uuid('order_id')->nullable();
             $table->string('tracking_number')->nullable();
             $table->string('payment_gateway')->nullable();
             $table->json('payment_intent_info')->nullable();
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreignUuid('order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -12,7 +15,7 @@ return new class () extends Migration {
     {
         Schema::create('old_refunds', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('old_payment_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('old_payment_id')->constrained()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
             $table->string('status', 20); // e.g., 'pending', 'approved', 'rejected'
             $table->text('reason')->nullable(); // Reason for the refund
