@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Drivers;
 
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\Payment\Enums\PaymentStatusOld as PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld as LegacyPaymentStatus;
 use Modules\Payment\Interfaces\PaymentDriverInterface;
 use Modules\Payment\Models\Payment;
 
@@ -23,7 +26,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
     /**
      * Update payment status in the database.
      */
-    public function updatePaymentStatus(string $tranId, string $status, array $data): void
+    final public function updatePaymentStatus(string $tranId, string $status, array $data): void
     {
         DB::transaction(function () use ($tranId, $status, $data): void {
             Payment::updateOrInsert(
@@ -37,7 +40,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
         });
     }
 
-    public function updatePayment(Payment $payment, $data): void
+    final public function updatePayment(Payment $payment, $data): void
     {
         $payment->update($data);
     }
@@ -45,7 +48,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
     /**
      * Process the payment status and execute callback logic.
      */
-    public function processPaymentStatus(string $tranId, string $status, callable $next): array
+    final public function processPaymentStatus(string $tranId, string $status, callable $next): array
     {
         // Validate and sanitize inputs
         if (empty($tranId) || empty($status)) {
@@ -74,7 +77,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
             try {
                 // Execute the callback logic if status matches
                 return $next($paymentDetails);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Log callback exception
                 error_log('Callback execution failed: '.$e->getMessage());
 
@@ -87,12 +90,12 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
 
         // Handle cases for other statuses using constants
         switch ($paymentDetails->status) {
-            case PaymentStatus::PROCESSING:
+            case LegacyPaymentStatus::PROCESSING->value:
                 return [
                     'status' => 'error',
                     'message' => 'Transaction is already being processed.',
                 ];
-            case PaymentStatus::COMPLETED:
+            case LegacyPaymentStatus::COMPLETED->value:
                 return [
                     'status' => 'error',
                     'message' => 'Transaction is already successfully completed.',
@@ -122,7 +125,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
      * @return array{ status: string, redirectURL: string } An array containing the formatted payment response, including the status,
      *                                                      redirect URL, message, and any additional data.
      */
-    public function formatInitialPaymentResponse(string $status, ?string $redirectURL, string $message, array $response, string $provider): array
+    final public function formatInitialPaymentResponse(string $status, ?string $redirectURL, string $message, array $response, string $provider): array
     {
         // Log an error if the status is 'error'
         if ($status === 'error') {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Traits;
 
 use Exception;
@@ -10,6 +12,7 @@ use Modules\Order\Traits\OrderStatusManagerWithPaymentTrait;
 use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Facades\Payment;
 use Modules\Settings\Models\Settings;
+use Throwable;
 
 trait PaymentStatusManagerWithOrderTrait
 {
@@ -39,7 +42,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -67,7 +70,7 @@ trait PaymentStatusManagerWithOrderTrait
                 }
             }
         } catch (Exception $e) {
-            throw new \Exception(SOMETHING_WENT_WRONG);
+            throw new Exception(SOMETHING_WENT_WRONG);
         }
     }
 
@@ -84,7 +87,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -95,7 +98,7 @@ trait PaymentStatusManagerWithOrderTrait
                 $payment = Payment::verify($paymentId);
                 if ($payment) {
                     $paymentStatus = $payment['status'];
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'completed':
                             $this->paymentSuccess($order);
                             break;
@@ -123,7 +126,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -133,7 +136,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
@@ -173,7 +176,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
@@ -198,7 +201,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -208,7 +211,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'valid':
                             $this->paymentSuccess($order);
                             break;
@@ -241,7 +244,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -251,7 +254,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'success':
                             $this->paymentSuccess($order);
                             break;
@@ -272,7 +275,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -282,7 +285,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'success':
                             $this->paymentSuccess($order);
                             break;
@@ -314,7 +317,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -324,7 +327,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
@@ -350,7 +353,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -360,7 +363,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'completed':
                             $this->paymentSuccess($order);
                             break;
@@ -386,7 +389,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -396,7 +399,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
@@ -428,7 +431,7 @@ trait PaymentStatusManagerWithOrderTrait
             // for multi-gateway options
             if (isset($order->payment_intent)) {
                 foreach ($order->payment_intent as $intent) {
-                    if (strtoupper($request['payment_gateway']) === $order->payment_gateway) {
+                    if (mb_strtoupper($request['payment_gateway']) === $order->payment_gateway) {
                         $chosen_intent = $intent;
                     }
                 }
@@ -438,7 +441,7 @@ trait PaymentStatusManagerWithOrderTrait
             if (isset($paymentId)) {
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
-                    switch (strtolower($paymentStatus)) {
+                    switch (mb_strtolower($paymentStatus)) {
                         case 'successful':
                             $this->paymentSuccess($order);
                             break;
@@ -453,22 +456,35 @@ trait PaymentStatusManagerWithOrderTrait
     }
 
     /**
+     * paymentAwaitingForApproval
+     *
+     * @param  mixed  $order
+     */
+    public function paymentAwaitingForApproval($order): void
+    {
+        $order->order_status = OrderStatus::Pending->value;
+        $order->payment_status = PaymentStatus::AwaitingForApproval->value;
+        $order->save();
+        $this->orderStatusManagementOnPayment($order, $order->order_status, $order->payment_status);
+    }
+
+    /**
      * Update DB status after payment success
      */
     protected function paymentSuccess($order): void
     {
-        $order->order_status = OrderStatus::PROCESSING;
-        $order->payment_status = PaymentStatus::SUCCESS;
+        $order->order_status = OrderStatus::Processing->value;
+        $order->payment_status = PaymentStatus::Success->value;
         $order->save();
         try {
             $children = json_decode($order->children);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $children = $order->children;
         }
         if (is_array($children) && count($children)) {
             foreach ($order->children as $child_order) {
-                $child_order->order_status = OrderStatus::PROCESSING;
-                $child_order->payment_status = PaymentStatus::SUCCESS;
+                $child_order->order_status = OrderStatus::Processing->value;
+                $child_order->payment_status = PaymentStatus::Success->value;
                 $child_order->save();
             }
         }
@@ -480,21 +496,8 @@ trait PaymentStatusManagerWithOrderTrait
      */
     protected function paymentProcessing($order): void
     {
-        $order->order_status = OrderStatus::PROCESSING;
-        $order->payment_status = PaymentStatus::PROCESSING;
-        $order->save();
-        $this->orderStatusManagementOnPayment($order, $order->order_status, $order->payment_status);
-    }
-
-    /**
-     * paymentAwaitingForApproval
-     *
-     * @param  mixed  $order
-     */
-    public function paymentAwaitingForApproval($order): void
-    {
-        $order->order_status = OrderStatus::PENDING;
-        $order->payment_status = PaymentStatus::AWAITING_FOR_APPROVAL;
+        $order->order_status = OrderStatus::Processing->value;
+        $order->payment_status = PaymentStatus::Processing->value;
         $order->save();
         $this->orderStatusManagementOnPayment($order, $order->order_status, $order->payment_status);
     }
@@ -504,8 +507,8 @@ trait PaymentStatusManagerWithOrderTrait
      */
     protected function paymentFailed($order): void
     {
-        $order->order_status = OrderStatus::FAILED;
-        $order->payment_status = PaymentStatus::FAILED;
+        $order->order_status = OrderStatus::Failed->value;
+        $order->payment_status = PaymentStatus::Failed->value;
         $order->save();
         $this->orderStatusManagementOnPayment($order, $order->order_status, $order->payment_status);
     }

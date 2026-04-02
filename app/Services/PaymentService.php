@@ -1,17 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Services;
 
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Modules\Order\Models\Order;
-use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Exceptions\InvalidProviderException;
 use Modules\Payment\Models\Payment;
 use Modules\Payment\Repositories\PaymentRepository;
 
-class PaymentService
+final class PaymentService
 {
-    public function __construct(protected PaymentRepository $paymentRepository)
+    /**
+     * Boundary rule:
+     * - `payments.status` is validated against PaymentStatusOld.
+     * - PaymentStatus is a separate workflow enum and must not be written to `payments.status`.
+     */
+    public function __construct(private PaymentRepository $paymentRepository)
     {
         //
     }
@@ -21,10 +29,17 @@ class PaymentService
      *
      * @throws Exception
      */
-    public function createPayment(Order $order): Payment
+    public function createPayment(Order $order, ?string $status = null): Payment
     {
+        $status = $status ?? PaymentStatusOld::PENDING->value;
+        $validStatuses = array_column(PaymentStatusOld::cases(), 'value');
+
+        if (! in_array($status, $validStatuses, true)) {
+            throw new InvalidArgumentException("Invalid legacy payment status [{$status}] provided.");
+        }
+
         return $order->payment()->create([
-            'status' => PaymentStatus::PENDING,
+            'status' => $status,
             'tran_id' => $this->generateTransactionId(),
             'amount' => $order->total_amount,
         ]);
@@ -150,13 +165,13 @@ class PaymentService
      */
     private function generateTransactionId(): string
     {
-        return 'TXN-'.now()->format('Ymd').strtoupper(bin2hex(random_bytes(4)));
+        return 'TXN-'.now()->format('Ymd').mb_strtoupper(bin2hex(random_bytes(4)));
     }
 
     /**
      * Resolve the correct payment provider.
      */
-    protected function resolveProvider(?string $providerName = null)
+    private function resolveProvider(?string $providerName = null)
     {
         if (! $providerName) {
             // Fetch the default provider if none is supplied
@@ -164,7 +179,7 @@ class PaymentService
         }
 
         // Fetch the provider configuration dynamically from the config file
-        $driver = config('payment.providers.'.strtolower($providerName).'.driver');
+        $driver = config('payment.providers.'.mb_strtolower($providerName).'.driver');
         if (! $driver) {
             throw new InvalidProviderException("Driver for provider '{$providerName}' is not defined in the configuration.");
         }

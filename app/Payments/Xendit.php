@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -11,7 +13,7 @@ use Modules\Payment\Traits\PaymentTrait;
 use Xendit\Invoice;
 use Xendit\Xendit as XenditFacade;
 
-class Xendit extends Base implements PaymentInterface
+final class Xendit extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -83,15 +85,15 @@ class Xendit extends Base implements PaymentInterface
             http_response_code(403);
         }
 
-        switch (strtolower($arrRequestInput['status'])) {
+        switch (mb_strtolower($arrRequestInput['status'])) {
             case 'paid':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'pending':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PENDING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
                 break;
             case 'failed':
-                $this->updatePaymentOrderStatus($request, OrderStatus::FAILED, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
                 break;
         }
         // To prevent loop for any case

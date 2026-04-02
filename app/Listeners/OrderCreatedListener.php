@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Listeners;
 
 use Modules\Order\Events\OrderCreatedEvent;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Services\PaymentService;
 
-class OrderCreatedListener
+final class OrderCreatedListener
 {
-    protected PaymentService $paymentService;
+    private PaymentService $paymentService;
 
     public function __construct(PaymentService $paymentService)
     {
@@ -19,6 +22,6 @@ class OrderCreatedListener
         $order = $event->order;
 
         // Create a payment record (mark as pending initially)
-        $this->paymentService->createPayment($order, 'pending');
+        $this->paymentService->createPayment($order, PaymentStatusOld::PENDING->value);
     }
 }

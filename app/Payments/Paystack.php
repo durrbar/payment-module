@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -12,7 +14,7 @@ use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Unicodeveloper\Paystack\Facades\Paystack as PaystackFacade;
 
-class Paystack extends Base implements PaymentInterface
+final class Paystack extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -92,13 +94,13 @@ class Paystack extends Base implements PaymentInterface
 
         switch ($event->data->status) {
             case 'success':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'pending':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PENDING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
                 break;
             case 'failed':
-                $this->updatePaymentOrderStatus($request, OrderStatus::FAILED, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
                 break;
         }
         // To prevent loop for any case

@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Drivers\Nagad;
 
+use Exception;
+use InvalidArgumentException;
 use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Models\Payment;
 
@@ -12,7 +16,7 @@ trait Helpers
         $required = ['merchant_id', 'merchant_number', 'public_key', 'private_key'];
         foreach ($required as $key) {
             if (empty($config[$key])) {
-                throw new \InvalidArgumentException("Missing Nagad config: {$key}");
+                throw new InvalidArgumentException("Missing Nagad config: {$key}");
             }
         }
     }
@@ -57,24 +61,24 @@ trait Helpers
     protected function validatePaymentObject(mixed $payment): void
     {
         if (! $payment instanceof Payment) {
-            throw new \InvalidArgumentException('Invalid payment object type');
+            throw new InvalidArgumentException('Invalid payment object type');
         }
 
         if ($payment->currency !== 'BDT') {
-            throw new \InvalidArgumentException('Nagad only supports BDT currency');
+            throw new InvalidArgumentException('Nagad only supports BDT currency');
         }
     }
 
     protected function handleInitiationResponse(array $response): array
     {
         if ($response['status'] !== 'Success') {
-            throw new \Exception(
+            throw new Exception(
                 $response['reason'] ?? 'Payment initialization failed'
             );
         }
 
         return [
-            'status' => PaymentStatus::PENDING,
+            'status' => PaymentStatus::Pending->value,
             'payment_id' => $response['paymentReferenceId'],
             'redirect_url' => $response['callBackUrl'],
             'qr_code' => $response['qrCode'] ?? null,
@@ -84,13 +88,13 @@ trait Helpers
     protected function handleVerificationResponse(array $response): array
     {
         if ($response['status'] !== 'Success') {
-            throw new \Exception(
+            throw new Exception(
                 $response['reason'] ?? 'Payment verification failed'
             );
         }
 
         return [
-            'status' => PaymentStatus::COMPLETED,
+            'status' => PaymentStatus::Success->value,
             'transaction_id' => $response['paymentReferenceId'],
             'amount' => $response['amount'],
             'currency' => 'BDT',
@@ -102,7 +106,7 @@ trait Helpers
         $required = ['payment_ref_id', 'status', 'amount'];
         foreach ($required as $key) {
             if (! isset($data[$key])) {
-                throw new \Exception("Missing IPN field: {$key}");
+                throw new Exception("Missing IPN field: {$key}");
             }
         }
     }

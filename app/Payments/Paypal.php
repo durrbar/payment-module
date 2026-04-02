@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -13,7 +15,7 @@ use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class Paypal extends Base implements PaymentInterface
+final class Paypal extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -185,16 +187,16 @@ class Paypal extends Base implements PaymentInterface
 
         switch ($request->event_type) {
             case 'PAYMENT.CAPTURE.COMPLETED':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'PAYMENT.CAPTURE.PENDING':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PENDING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
                 break;
             case 'PAYMENT.CAPTURE.CANCELLED':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Failed->value);
                 break;
             case 'PAYMENT.CAPTURE.REVERSED':
-                $this->updatePaymentOrderStatus($request, OrderStatus::CANCELLED, PaymentStatus::REVERSAL);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Cancelled->value, PaymentStatus::Reversal->value);
                 break;
         }
 

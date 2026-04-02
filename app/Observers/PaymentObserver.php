@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Observers;
 
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Events\PaymentCreatedEvent;
 use Modules\Payment\Events\PaymentSuccessEvent;
 use Modules\Payment\Models\Payment;
 
-class PaymentObserver
+final class PaymentObserver
 {
     public function __construct()
     {
@@ -30,7 +33,7 @@ class PaymentObserver
     public function updated(Payment $payment): void
     {
         // Check if the payment status has changed to 'successful'
-        if ($payment->isDirty('status') && $payment->status === 'successful') {
+        if ($payment->isDirty('status') && $payment->status === PaymentStatusOld::SUCCESSFUL->value) {
             event(new PaymentSuccessEvent($payment));
         }
     }

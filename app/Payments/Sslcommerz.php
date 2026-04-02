@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use DGvai\SSLCommerz\SSLCommerz as SslCommerzClient;
@@ -11,7 +13,7 @@ use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Traits\PaymentTrait;
 use Throwable;
 
-class Sslcommerz extends Base implements PaymentInterface
+final class Sslcommerz extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -99,10 +101,10 @@ class Sslcommerz extends Base implements PaymentInterface
         $validatePayment = $this->sslCommerzClient->validate_payment($request);
         switch ($validatePayment) {
             case true:
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case false:
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Failed->value);
                 break;
         }
         http_response_code(200);
@@ -117,43 +119,6 @@ class Sslcommerz extends Base implements PaymentInterface
         $trackingId = $request['tran_id'];
         $order = Order::where('tracking_number', '=', $trackingId)->first();
         $this->webhookSuccessResponse($order, $orderStatus, $paymentStatus);
-    }
-
-    /**
-     * It returns an array of customer data
-     *
-     * @return array An array of data.
-     */
-    private function getCustomerParams(): array
-    {
-        return [
-            'email' => 'antonymous@mail.com',
-            'mobile' => rand(10000000000, 99999999999),
-            'name' => 'Antonymous',
-        ];
-    }
-
-    /**
-     * It takes an order tracking number and returns an array of URLs
-     *
-     * @param string|int This is the order tracking number that you will use to identify the
-     * order.
-     * @return array An array of strings.
-     */
-    private function generateUrl($order_tracking_umber): array
-    {
-        $shopUrl = config('shop.shop_url');
-        $success = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
-        $failure = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
-        $cancel = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
-        $ipn = route('sslc.sslcommerz');
-
-        return [
-            $success,
-            $failure,
-            $cancel,
-            $ipn,
-        ];
     }
 
     /**
@@ -224,5 +189,42 @@ class Sslcommerz extends Base implements PaymentInterface
     public function detachPaymentMethodToCustomer($retrieved_payment_method): object
     {
         return (object) [];
+    }
+
+    /**
+     * It returns an array of customer data
+     *
+     * @return array An array of data.
+     */
+    private function getCustomerParams(): array
+    {
+        return [
+            'email' => 'antonymous@mail.com',
+            'mobile' => rand(10000000000, 99999999999),
+            'name' => 'Antonymous',
+        ];
+    }
+
+    /**
+     * It takes an order tracking number and returns an array of URLs
+     *
+     * @param string|int This is the order tracking number that you will use to identify the
+     * order.
+     * @return array An array of strings.
+     */
+    private function generateUrl($order_tracking_umber): array
+    {
+        $shopUrl = config('shop.shop_url');
+        $success = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
+        $failure = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
+        $cancel = "{$shopUrl}/orders/{$order_tracking_umber}/thank-you";
+        $ipn = route('sslc.sslcommerz');
+
+        return [
+            $success,
+            $failure,
+            $cancel,
+            $ipn,
+        ];
     }
 }

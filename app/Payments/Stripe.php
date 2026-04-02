@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -10,8 +12,9 @@ use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Traits\PaymentTrait;
 use Stripe\StripeClient;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use UnexpectedValueException;
 
-class Stripe extends Base implements PaymentInterface
+final class Stripe extends Base implements PaymentInterface
 {
     use OrderStatusManagerWithPaymentTrait;
     use PaymentTrait;
@@ -175,7 +178,7 @@ class Stripe extends Base implements PaymentInterface
             throw new HttpException(400, API_CONNECTION_FAILED);
         } catch (\Stripe\Exception\ApiErrorException $e) {
             throw new HttpException(400, API_CONNECTION_FAILED);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HttpException(400, SOMETHING_WENT_WRONG_WITH_PAYMENT);
         }
     }
@@ -209,7 +212,7 @@ class Stripe extends Base implements PaymentInterface
             throw new HttpException(400, API_CONNECTION_FAILED);
         } catch (\Stripe\Exception\ApiErrorException $e) {
             throw new HttpException(400, API_CONNECTION_FAILED);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HttpException(400, SOMETHING_WENT_WRONG_WITH_PAYMENT);
         }
     }
@@ -260,7 +263,7 @@ class Stripe extends Base implements PaymentInterface
                 $sig_header,
                 $endpoint_secret
             );
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             // Invalid payload
             http_response_code(400);
             exit();
@@ -309,27 +312,27 @@ class Stripe extends Base implements PaymentInterface
                 case 'succeeded':
                     // code...
                     // Throw email to admin that order is success.
-                    $this->webhookSuccessResponse($order, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                    $this->webhookSuccessResponse($order, OrderStatus::Processing->value, PaymentStatus::Success->value);
                     break;
 
                 case 'pending':
                     // code...
                     // Throw email to admin that order is pending.
                     // Throw email to user that order is pending.
-                    $order->order_status = OrderStatus::PENDING;
-                    $order->payment_status = PaymentStatus::AWAITING_FOR_APPROVAL;
+                    $order->order_status = OrderStatus::Pending->value;
+                    $order->payment_status = PaymentStatus::AwaitingForApproval->value;
                     $order->save();
-                    $this->orderStatusManagementOnPayment($order, OrderStatus::PENDING, PaymentStatus::AWAITING_FOR_APPROVAL);
+                    $this->orderStatusManagementOnPayment($order, OrderStatus::Pending->value, PaymentStatus::AwaitingForApproval->value);
                     break;
 
                 case 'failed':
                     // code...
                     // Throw email to admin that order is pending.
                     // Throw email to user that order is failure.
-                    $order->order_status = OrderStatus::PENDING;
-                    $order->payment_status = PaymentStatus::FAILED;
+                    $order->order_status = OrderStatus::Pending->value;
+                    $order->payment_status = PaymentStatus::Failed->value;
                     $order->save();
-                    $this->orderStatusManagementOnPayment($order, OrderStatus::PENDING, PaymentStatus::FAILED);
+                    $this->orderStatusManagementOnPayment($order, OrderStatus::Pending->value, PaymentStatus::Failed->value);
                     break;
             }
         }
@@ -375,7 +378,7 @@ class Stripe extends Base implements PaymentInterface
 
     public function matchSucceededOrFailed($request)
     {
-        if (isset($request?->data['object']['object']) && $request?->data['object']['object'] == 'charge') {
+        if (isset($request?->data['object']['object']) && $request?->data['object']['object'] === 'charge') {
             return $request?->data['object'];
         }
 

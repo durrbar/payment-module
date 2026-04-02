@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -12,7 +14,7 @@ use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 
-class Flutterwave extends Base implements PaymentInterface
+final class Flutterwave extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -22,6 +24,35 @@ class Flutterwave extends Base implements PaymentInterface
     {
         parent::__construct();
         $this->flutterwave = new FlutterwaveFacade(config('shop.flutterwave.secret_key'), config('shop.flutterwave.public_key'));
+    }
+
+    /**
+     *  Flutterwave callback
+     *
+     * @param  mixed  $request
+     * @return void
+     */
+    public static function callback(Request $request)
+    {
+        try {
+            $tx_ref = $request['tx_ref'];
+            if ($request['status'] === 'cancelled') {
+                $tracking_number1 = PaymentIntent::whereJsonContains('payment_intent_info->payment_id', $tx_ref)->first();
+
+                return redirect(config('shop.shop_url')."/orders/{$tracking_number1->payment_intent_info['order_tracking_number']}/payment");
+            }
+
+            $transactionID = $request['transaction_id'];
+            $result = FlutterwaveFacade::verifyTransaction($transactionID);
+            $tracking_number = $result['data']['meta']['order_tracking_number'];
+            PaymentIntent::whereJsonContains('payment_intent_info->payment_id', $tx_ref)->update([
+                'payment_intent_info->payment_id' => $transactionID,
+            ]);
+
+            return redirect(config('shop.shop_url')."/orders/{$tracking_number}/thank-you");
+        } catch (Exception $e) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG_WITH_PAYMENT);
+        }
     }
 
     public function getIntent($data): array
@@ -60,35 +91,6 @@ class Flutterwave extends Base implements PaymentInterface
         }
     }
 
-    /**
-     *  Flutterwave callback
-     *
-     * @param  mixed  $request
-     * @return void
-     */
-    public static function callback(Request $request)
-    {
-        try {
-            $tx_ref = $request['tx_ref'];
-            if ($request['status'] == 'cancelled') {
-                $tracking_number1 = PaymentIntent::whereJsonContains('payment_intent_info->payment_id', $tx_ref)->first();
-
-                return redirect(config('shop.shop_url')."/orders/{$tracking_number1->payment_intent_info['order_tracking_number']}/payment");
-            }
-
-            $transactionID = $request['transaction_id'];
-            $result = FlutterwaveFacade::verifyTransaction($transactionID);
-            $tracking_number = $result['data']['meta']['order_tracking_number'];
-            PaymentIntent::whereJsonContains('payment_intent_info->payment_id', $tx_ref)->update([
-                'payment_intent_info->payment_id' => $transactionID,
-            ]);
-
-            return redirect(config('shop.shop_url')."/orders/{$tracking_number}/thank-you");
-        } catch (Exception $e) {
-            throw new DurrbarException(SOMETHING_WENT_WRONG_WITH_PAYMENT);
-        }
-    }
-
     public function verify($transaction): mixed
     {
 
@@ -113,10 +115,10 @@ class Flutterwave extends Base implements PaymentInterface
         try {
             $verified = FlutterwaveFacade::verifyWebhook();
 
-            if ($verified && $request->event == 'charge.completed' && $request->data['status'] == 'successful') {
+            if ($verified && $request->event === 'charge.completed' && $request->data['status'] === 'successful') {
                 $verificationData = FlutterwaveFacade::verifyTransaction($request->data['id']);
                 if ($verificationData['status'] === 'success') {
-                    $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                    $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 }
             }
         } catch (Exception $e) {

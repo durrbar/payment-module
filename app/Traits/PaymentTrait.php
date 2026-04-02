@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Traits;
 
 use Exception;
@@ -16,6 +18,7 @@ use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Models\PaymentMethod;
 use Modules\Settings\Models\Settings;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 trait PaymentTrait
 {
@@ -55,11 +58,11 @@ trait PaymentTrait
             $initial_payment_gateway = $order->payment_gateway;
 
             if ($requested_payment_gateway !== $initial_payment_gateway) {
-                $chosen_payment_gateway = ucfirst(strtolower($request['payment_gateway']));
+                $chosen_payment_gateway = ucfirst(mb_strtolower($request['payment_gateway']));
             } else {
                 if (isset($settings->options['paymentGateway'])) {
                     foreach ($settings->options['paymentGateway'] as $available_gateway) {
-                        if (strtoupper($available_gateway['name']) === $requested_payment_gateway) {
+                        if (mb_strtoupper($available_gateway['name']) === $requested_payment_gateway) {
                             $chosen_payment_gateway = ucfirst($available_gateway['name']);
                         }
                     }
@@ -73,7 +76,7 @@ trait PaymentTrait
                     $newPaymentIntent = $this->savePaymentIntent($order, $chosen_payment_gateway, $request);
 
                     if ($request['recall_gateway'] && isset($newPaymentIntent)) {
-                        $this->deleteOlderPaymentIntent($order_tracking_number, ucfirst(strtolower($order->payment_gateway)));
+                        $this->deleteOlderPaymentIntent($order_tracking_number, ucfirst(mb_strtolower($order->payment_gateway)));
                         $this->updateOrderData($initial_payment_gateway, $chosen_payment_gateway, $order);
                     }
 
@@ -85,7 +88,7 @@ trait PaymentTrait
                 $query->where('tracking_number', '=', $order_tracking_number)
                     ->orWhere('order_id', '=', $order_tracking_number);
             })->where('payment_gateway', '=', ucfirst($chosen_payment_gateway))->first();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
@@ -120,16 +123,16 @@ trait PaymentTrait
     public function updateOrderData(string $initial_payment_gateway, string $chosen_payment_gateway, object $order): void
     {
         $order['altered_payment_gateway'] = $initial_payment_gateway;
-        $order['payment_gateway'] = strtoupper($chosen_payment_gateway);
+        $order['payment_gateway'] = mb_strtoupper($chosen_payment_gateway);
         $order->save();
         try {
             $children = json_decode($order->children);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $children = $order->children;
         }
         if (is_array($children) && count($children)) {
             foreach ($order->children as $child_order) {
-                $child_order->payment_gateway = strtoupper($chosen_payment_gateway);
+                $child_order->payment_gateway = mb_strtoupper($chosen_payment_gateway);
                 $child_order->altered_payment_gateway = $initial_payment_gateway;
                 $child_order->save();
             }
@@ -165,22 +168,22 @@ trait PaymentTrait
     public function createPaymentIntent(Order $order, Request $request, string $payment_gateway): array
     {
         $created_intent = [
-            'amount' => $order->paid_total - intval($order?->wallet?->amount),
+            'amount' => $order->paid_total - (int) ($order?->wallet?->amount),
             'order_tracking_number' => $order->tracking_number,
         ];
         if ($request->user() !== null) {
             $created_intent['user_email'] = $order->customer->email;
         }
 
-        if ($request->user() !== null && strtoupper($payment_gateway) === PaymentGatewayType::STRIPE) {
+        if ($request->user() !== null && mb_strtoupper($payment_gateway) === PaymentGatewayType::Stripe->value) {
             $customer = $this->createPaymentCustomer($request);
             $created_intent['customer'] = $customer['customer_id'];
         }
-        if (strtoupper($payment_gateway) === PaymentGatewayType::IYZICO) {
+        if (mb_strtoupper($payment_gateway) === PaymentGatewayType::Iyzico->value) {
             $created_intent['ip'] = $request->ip();
         }
 
-        if (strtoupper($payment_gateway) === PaymentGatewayType::PAYMONGO) {
+        if (mb_strtoupper($payment_gateway) === PaymentGatewayType::Paymongo->value) {
             $created_intent['selected_payment_path'] = $request['payment_sub_gateway'];
         }
 
@@ -194,7 +197,7 @@ trait PaymentTrait
     {
         try {
             return Order::where('id', '=', $tracking_number)->orWhere('tracking_number', $tracking_number)->first();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HttpException(404, NOT_FOUND);
         }
     }
@@ -248,7 +251,7 @@ trait PaymentTrait
             }
 
             return $payment_method;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
@@ -262,11 +265,13 @@ trait PaymentTrait
     public function createPaymentCustomer($request)
     {
         try {
-            $selected_payment_gateway = strtoupper($request->payment_gateway);
+            $selected_payment_gateway = mb_strtoupper($request->payment_gateway);
 
             if (! $this->customerAlreadyExists($request->user()->id, $selected_payment_gateway)) {
                 $customer = Payment::createCustomer($request);
-                if (in_array($selected_payment_gateway, PaymentGatewayType::getValues())) {
+                $validGateways = array_column(PaymentGatewayType::cases(), 'value');
+
+                if (in_array($selected_payment_gateway, $validGateways, true)) {
                     PaymentGateway::create([
                         'user_id' => $request->user()->id,
                         'customer_id' => $customer['customer_id'],
@@ -278,7 +283,7 @@ trait PaymentTrait
             }
 
             return $customer;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new HttpException(400, SOMETHING_WENT_WRONG);
         }
     }
@@ -299,7 +304,7 @@ trait PaymentTrait
             }
 
             return $customer_exists;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -320,7 +325,7 @@ trait PaymentTrait
             }
 
             return $payment_method_exists;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -345,7 +350,7 @@ trait PaymentTrait
         $order->save();
         try {
             $children = json_decode($order->children);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $children = $order->children;
         }
         if (is_array($children) && count($children)) {
@@ -355,6 +360,6 @@ trait PaymentTrait
                 $child_order->save();
             }
         }
-        $this->orderStatusManagementOnPayment($order, OrderStatus::PROCESSING, $payment_status);
+        $this->orderStatusManagementOnPayment($order, OrderStatus::Processing->value, $payment_status);
     }
 }

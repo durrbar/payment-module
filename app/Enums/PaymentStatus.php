@@ -1,32 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class RoleType
- */
-final class PaymentStatus extends Enum
+enum PaymentStatus: string
 {
-    public const PENDING = 'payment-pending';
-
-    public const PROCESSING = 'payment-processing';
-
-    public const SUCCESS = 'payment-success';
-
-    public const FAILED = 'payment-failed';
-
-    public const REVERSAL = 'payment-reversal';
-
-    public const REFUNDED = 'payment-refunded';
-
-    public const CASH_ON_DELIVERY = 'payment-cash-on-delivery';
-
-    public const CASH = 'payment-cash';
-
-    public const WALLET = 'payment-wallet';
-
-    public const AWAITING_FOR_APPROVAL = 'payment-awaiting-for-approval';
-    // public const DEFAULT_PAYMENT_STATUS = 'payment-pending';
+    case Pending = 'payment-pending';
+    case Processing = 'payment-processing';
+    case Success = 'payment-success';
+    case Failed = 'payment-failed';
+    case Reversal = 'payment-reversal';
+    case Refunded = 'payment-refunded';
+    case CashOnDelivery = 'payment-cash-on-delivery';
+    case Cash = 'payment-cash';
+    case Wallet = 'payment-wallet';
+    case AwaitingForApproval = 'payment-awaiting-for-approval';
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use Modules\Payment\Http\Controllers\PaymentController;
 use Modules\Payment\Http\Controllers\PaymentIntentController;
@@ -43,7 +45,7 @@ Route::get('callback/flutterwave', [WebHookController::class, 'callback'])->name
  * Authorized Route for Customers only
  * ******************************************
  */
-Route::group(['middleware' => ['can:'.Permission::CUSTOMER, 'auth:sanctum', 'email.verified']], function (): void {
+Route::group(['middleware' => ['can:'.Permission::Customer->value, 'auth:sanctum', 'email.verified']], function (): void {
     Route::apiResource('cards', PaymentMethodController::class, [
         'only' => ['index', 'store', 'update', 'destroy'],
     ]);

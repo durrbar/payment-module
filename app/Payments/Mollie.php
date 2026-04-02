@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -11,7 +13,7 @@ use Mollie\Laravel\Facades\Mollie as MollieFacade;
 use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class Mollie extends Base implements PaymentInterface
+final class Mollie extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -132,15 +134,15 @@ class Mollie extends Base implements PaymentInterface
             $payment = MollieFacade::api()->payments()->get($request->id);
 
             if ($payment->isPaid() && ! $payment->hasRefunds() && ! $payment->hasChargebacks()) {
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
             } elseif ($payment->isOpen()) {
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PENDING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
             } elseif ($payment->isPending()) {
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::AWAITING_FOR_APPROVAL);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::AwaitingForApproval->value);
             } elseif ($payment->isCanceled()) {
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PENDING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
             } elseif ($payment->isFailed() || $payment->isExpired() || $payment->hasRefunds() || $payment->hasRefunds() || $payment->hasChargebacks()) {
-                $this->updatePaymentOrderStatus($request, OrderStatus::FAILED, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
             }
 
             // To prevent loop for any case

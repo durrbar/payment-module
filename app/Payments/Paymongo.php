@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -12,7 +14,7 @@ use Modules\Payment\Traits\PaymentTrait;
 use Stripe\Exception\SignatureVerificationException;
 use Throwable;
 
-class Paymongo extends Base implements PaymentInterface
+final class Paymongo extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -72,7 +74,7 @@ class Paymongo extends Base implements PaymentInterface
     {
         $source = PaymongoFacade::source()->find($paymentId);
         try {
-            if ($source->status == 'chargeable') {
+            if ($source->status === 'chargeable') {
                 $order = PaymongoFacade::payment()->create([
                     'amount' => $source->amount,
                     'currency' => $this->currency,
@@ -115,13 +117,13 @@ class Paymongo extends Base implements PaymentInterface
         $eventStatus = $request['data']['attributes']['data']['attributes']['status'];
         switch ($eventStatus) {
             case 'chargeable':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'payment.paid':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'payment.failed ':
-                $this->updatePaymentOrderStatus($request, OrderStatus::FAILED, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
                 break;
         }
 

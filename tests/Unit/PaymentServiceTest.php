@@ -1,34 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Tests\Unit;
 
+use InvalidArgumentException;
 use Mockery;
-use Modules\Invoice\Services\InvoiceService;
 use Modules\Order\Models\Order;
-use Modules\Order\Services\OrderService;
-use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Models\Payment;
+use Modules\Payment\Repositories\PaymentRepository;
 use Modules\Payment\Services\PaymentService;
 use Tests\TestCase;
 
-class PaymentServiceTest extends TestCase
+final class PaymentServiceTest extends TestCase
 {
     protected PaymentService $paymentService;
 
-    protected OrderService $mockOrderService;
-
-    protected InvoiceService $mockInvoiceService;
+    protected PaymentRepository $mockPaymentRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->mockOrderService = Mockery::mock(OrderService::class);
-        $this->mockInvoiceService = Mockery::mock(InvoiceService::class);
+        $this->mockPaymentRepository = Mockery::mock(PaymentRepository::class);
 
         $this->paymentService = new PaymentService(
-            $this->mockOrderService,
-            $this->mockInvoiceService
+            $this->mockPaymentRepository
         );
     }
 
@@ -41,7 +39,7 @@ class PaymentServiceTest extends TestCase
     public function test_create_payment_successfully()
     {
         // Create a mock of the Order model
-        /** @var \Modules\Order\Models\Order|\Mockery\MockInterface $order */
+        /** @var Order|Mockery\MockInterface $order */
         $order = Mockery::mock(Order::class);
         $order->shouldAllowMockingMethod('payment'); // Allow mocking the 'payment' relationship
 
@@ -53,7 +51,7 @@ class PaymentServiceTest extends TestCase
         $paymentMock = Mockery::mock(Payment::class);
         $order->shouldReceive('payment->create')
             ->with(Mockery::on(function ($data) {
-                return $data['status'] === PaymentStatus::PENDING
+                return $data['status'] === PaymentStatusOld::PENDING->value
                     && str_starts_with($data['tran_id'], 'TXN-')
                     && $data['amount'] === 500.00;
             }))
@@ -65,5 +63,42 @@ class PaymentServiceTest extends TestCase
         // Assertions
         $this->assertInstanceOf(Payment::class, $result);
         $this->assertSame($paymentMock, $result);
+    }
+
+    public function test_create_payment_with_explicit_status_override(): void
+    {
+        /** @var Order|Mockery\MockInterface $order */
+        $order = Mockery::mock(Order::class);
+        $order->shouldAllowMockingMethod('payment');
+
+        $order->shouldReceive('getAttribute')
+            ->with('total_amount')
+            ->andReturn(700.00);
+
+        $paymentMock = Mockery::mock(Payment::class);
+        $order->shouldReceive('payment->create')
+            ->with(Mockery::on(function ($data) {
+                return $data['status'] === PaymentStatusOld::SUCCESSFUL->value
+                    && str_starts_with($data['tran_id'], 'TXN-')
+                    && $data['amount'] === 700.00;
+            }))
+            ->andReturn($paymentMock);
+
+        $result = $this->paymentService->createPayment($order, PaymentStatusOld::SUCCESSFUL->value);
+
+        $this->assertInstanceOf(Payment::class, $result);
+        $this->assertSame($paymentMock, $result);
+    }
+
+    public function test_create_payment_throws_for_invalid_legacy_status(): void
+    {
+        /** @var Order|Mockery\MockInterface $order */
+        $order = Mockery::mock(Order::class);
+        $order->shouldAllowMockingMethod('payment');
+        $order->shouldNotReceive('payment->create');
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->paymentService->createPayment($order, 'payment-pending');
     }
 }

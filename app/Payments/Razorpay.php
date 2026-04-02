@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -14,7 +16,7 @@ use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class Razorpay extends Base implements PaymentInterface
+final class Razorpay extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -104,13 +106,13 @@ class Razorpay extends Base implements PaymentInterface
             case 'dispute.won':
             case 'dispute.created':
             case 'authorized':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::PROCESSING);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Processing->value);
                 break;
             case 'captured':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
             case 'failed':
-                $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::FAILED);
+                $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Failed->value);
         }
 
         // To prevent loop for any case

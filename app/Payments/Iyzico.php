@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use ErrorException;
@@ -24,7 +26,7 @@ use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 use Throwable;
 
-class Iyzico extends Base implements PaymentInterface
+final class Iyzico extends Base implements PaymentInterface
 {
     use PaymentTrait;
 
@@ -56,7 +58,7 @@ class Iyzico extends Base implements PaymentInterface
         try {
 
             $iyzicoOrder = $this->requestToIyzico($data);
-            if ($iyzicoOrder->getStatus() == 'failure') {
+            if ($iyzicoOrder->getStatus() === 'failure') {
                 throw new ErrorException($iyzicoOrder->getErrorMessage());
             }
 
@@ -105,23 +107,23 @@ class Iyzico extends Base implements PaymentInterface
             $orderStatus = false;
         }
         // Verify webhook
-        if ($stringToBeHashed == $webhookSignature || $orderStatus) {
+        if ($stringToBeHashed === $webhookSignature || $orderStatus) {
             switch ($request->status) {
                 case 'SUCCESS':
-                    $this->updatePaymentOrderStatus($request, OrderStatus::PROCESSING, PaymentStatus::SUCCESS);
+                    $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                     break;
                 case 'FAILURE':
-                    $this->updatePaymentOrderStatus($request, OrderStatus::PENDING, PaymentStatus::FAILED);
+                    $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Failed->value);
                     break;
             }
             // To prevent loop for any case
             http_response_code(200);
             exit();
-        } else {
-            // Invalid request
-            http_response_code(400);
-            exit();
         }
+        // Invalid request
+        http_response_code(400);
+        exit();
+
     }
 
     /**
