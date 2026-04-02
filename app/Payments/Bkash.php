@@ -8,6 +8,7 @@ use Exception;
 use Karim007\LaravelBkashTokenize\Facade\BkashPaymentTokenize;
 use Modules\Core\Exceptions\DurrbarException;
 use Modules\Order\Models\Order;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Traits\PaymentTrait;
 
 class Bkash extends Base implements PaymentInterface
@@ -59,7 +60,7 @@ class Bkash extends Base implements PaymentInterface
                 $result = BkashPaymentTokenize::queryPayment($paymentId);
             }
             if ($result['statusCode'] === '2023' || $result['statusCode'] === '2056') {
-                return 'failed';
+                return PaymentStatusOld::FAILED->value;
             }
 
             return isset($result['transactionStatus']) ? $result['transactionStatus'] : false;
