@@ -32,7 +32,7 @@ class PaymentMethodRepository extends BaseRepository
         'payment_intent',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -44,7 +44,7 @@ class PaymentMethodRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return PaymentMethod::class;
     }
