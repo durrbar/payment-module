@@ -23,10 +23,8 @@ class PaymentIntentRepository extends BaseRepository
 
     /**
      * boot
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -38,7 +36,7 @@ class PaymentIntentRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return PaymentIntent::class;
     }
@@ -46,11 +44,9 @@ class PaymentIntentRepository extends BaseRepository
     /**
      * getPaymentIntent
      *
-     * @param  mixed  $request
-     * @param  mixed  $settings
      * @return void
      */
-    public function getPaymentIntent($request, $settings)
+    public function getPaymentIntent(mixed $request, mixed $settings): mixed
     {
         return $this->processPaymentIntent($request, $settings);
     }
