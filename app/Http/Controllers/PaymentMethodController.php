@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Http\Controllers\CoreController;
@@ -77,7 +80,7 @@ class PaymentMethodController extends CoreController
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function destroy(Request $request, mixed $id)
     {
@@ -94,7 +97,7 @@ class PaymentMethodController extends CoreController
                 Payment::detachPaymentMethodToCustomer($retrieved_payment_method->method_key);
 
                 return $this->repository->findOrFail($request->id)->forceDelete();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new HttpException(409, COULD_NOT_DELETE_THE_RESOURCE);
             }
         } catch (DurrbarException $e) {

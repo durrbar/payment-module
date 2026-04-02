@@ -13,7 +13,7 @@ use Mollie\Laravel\Facades\Mollie as MollieFacade;
 use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class Mollie extends Base implements PaymentInterface
+class Mollie extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

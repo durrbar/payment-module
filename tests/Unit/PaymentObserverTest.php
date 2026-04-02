@@ -11,7 +11,7 @@ use Modules\Payment\Models\Payment;
 use Modules\Payment\Observers\PaymentObserver;
 use Tests\TestCase;
 
-final class PaymentObserverTest extends TestCase
+class PaymentObserverTest extends TestCase
 {
     public function test_updated_dispatches_payment_success_event_for_successful_status(): void
     {

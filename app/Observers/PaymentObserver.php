@@ -9,7 +9,7 @@ use Modules\Payment\Events\PaymentCreatedEvent;
 use Modules\Payment\Events\PaymentSuccessEvent;
 use Modules\Payment\Models\Payment;
 
-final class PaymentObserver
+class PaymentObserver
 {
     public function __construct()
     {

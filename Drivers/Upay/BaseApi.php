@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Drivers\Upay;
 
 // use Codeboxr\Upay\Exception\UpayException;
@@ -11,16 +13,16 @@ class BaseApi
     /**
      * @var string
      */
-    protected $token = '';
+    private $token = '';
 
     /**
      * @var string
      */
-    protected $baseUrl = '';
+    private $baseUrl = '';
 
     public function __construct()
     {
-        $this->baseUrl = config('payment.upay.sandbox') == true ? 'https://uat-pg.upay.systems/' : 'https://pg.upaysystem.com/';
+        $this->baseUrl = config('payment.upay.sandbox') === true ? 'https://uat-pg.upay.systems/' : 'https://pg.upaysystem.com/';
     }
 
     /**
@@ -30,7 +32,7 @@ class BaseApi
      *
      * @throws UpayException
      */
-    protected function headers()
+    private function headers()
     {
         return [
             'Authorization' => "UPAY {$this->getToken()}",
@@ -45,7 +47,7 @@ class BaseApi
      *
      * @throws UpayException
      */
-    protected function getToken()
+    private function getToken()
     {
         if (empty($this->token)) {
             $response = $this->request()
@@ -70,10 +72,10 @@ class BaseApi
      *
      * @return PendingRequest
      */
-    protected function request()
+    private function request()
     {
         $request = Http::acceptJson();
-        if (config('upay.sandbox') != true) {
+        if (config('upay.sandbox') !== true) {
             $request->withOptions([
                 'curl' => [CURLOPT_INTERFACE => config('payment.upay.server_ip'), CURLOPT_IPRESOLVE => 1],
             ]);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Payments;
 
 use Exception;
@@ -56,7 +58,7 @@ class Bkash extends Base implements PaymentInterface
             if (! $result) {
                 $result = BkashPaymentTokenize::queryPayment($paymentId);
             }
-            if ($result['statusCode'] == '2023' || $result['statusCode'] == '2056') {
+            if ($result['statusCode'] === '2023' || $result['statusCode'] === '2056') {
                 return 'failed';
             }
 
@@ -82,9 +84,7 @@ class Bkash extends Base implements PaymentInterface
     /**
      * Update Payment and Order Status
      */
-    public function updatePaymentOrderStatus($request, $orderStatus, $paymentStatus): void
-    {
-    }
+    public function updatePaymentOrderStatus($request, $orderStatus, $paymentStatus): void {}
 
     /**
      * createCustomer

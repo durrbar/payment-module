@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 // use Modules\Payment\Database\Factories\DiscountFactory;
 
+#[Fillable([])]
 class Discount extends Model
 {
-    use HasUuids;
     use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     */
-    protected $fillable = [];
+    use HasUuids;
 
     // protected static function newFactory(): DiscountFactory
     // {

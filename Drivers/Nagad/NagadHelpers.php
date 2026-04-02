@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Drivers\Nagad;
 
 use Carbon\Carbon;
@@ -8,6 +10,17 @@ use Modules\Payment\Drivers\Nagad\Exceptions\NagadInvalidPublicKey;
 
 trait NagadHelpers
 {
+    /**
+     * @return mixed
+     */
+    public static function decryptDataPrivateKey(string $data)
+    {
+        $private_key = "-----BEGIN RSA PRIVATE KEY-----\n".config('nagad.private_key')."\n-----END RSA PRIVATE KEY-----";
+        openssl_private_decrypt(base64_decode($data), $plain_text, $private_key);
+
+        return $plain_text;
+    }
+
     /**
      * @return string|null
      */
@@ -23,7 +36,7 @@ trait NagadHelpers
     public function getRandomString($length = 45)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
+        $charactersLength = mb_strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
@@ -57,20 +70,8 @@ trait NagadHelpers
         $status = openssl_public_encrypt($data, $cryptoText, $keyResource);
         if ($status) {
             return base64_encode($cryptoText);
-        } else {
-            throw new NagadInvalidPublicKey('Invalid Public key');
         }
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function decryptDataPrivateKey(string $data)
-    {
-        $private_key = "-----BEGIN RSA PRIVATE KEY-----\n".config('nagad.private_key')."\n-----END RSA PRIVATE KEY-----";
-        openssl_private_decrypt(base64_decode($data), $plain_text, $private_key);
-
-        return $plain_text;
+        throw new NagadInvalidPublicKey('Invalid Public key');
     }
 
     /**
@@ -84,9 +85,7 @@ trait NagadHelpers
         $status = openssl_sign($data, $signature, $private_key, OPENSSL_ALGO_SHA256);
         if ($status) {
             return base64_encode($signature);
-        } else {
-            throw new NagadInvalidPrivateKey('Invalid private key');
         }
-
+        throw new NagadInvalidPrivateKey('Invalid private key');
     }
 }

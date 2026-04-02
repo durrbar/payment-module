@@ -15,7 +15,7 @@ use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-final class Paypal extends Base implements PaymentInterface
+class Paypal extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Repositories;
 
 use Exception;
@@ -80,11 +82,11 @@ class PaymentMethodRepository extends BaseRepository
 
         if ($this->paymentMethodAlreadyExists($retrieved_payment_method->card->fingerprint)) {
             return PaymentMethod::where('fingerprint', '=', $retrieved_payment_method->card->fingerprint)->first();
-        } else {
-            $attached_payment_method = Payment::attachPaymentMethodToCustomer($retrieved_payment_method->id, $request);
-
-            return $this->saveCard($attached_payment_method, $request);
         }
+        $attached_payment_method = Payment::attachPaymentMethodToCustomer($retrieved_payment_method->id, $request);
+
+        return $this->saveCard($attached_payment_method, $request);
+
     }
 
     /**
@@ -103,12 +105,12 @@ class PaymentMethodRepository extends BaseRepository
                     $retrieved_payment_method = Payment::retrievePaymentMethod($request['method_key']);
                     if ($this->paymentMethodAlreadyExists($retrieved_payment_method->card->fingerprint)) {
                         return PaymentMethod::where('fingerprint', '=', $retrieved_payment_method->card->fingerprint)->first();
-                    } else {
-                        // attach card with customer
-                        $attached_payment_method = Payment::attachPaymentMethodToCustomer($retrieved_payment_method->id, $request);
-
-                        return $this->saveCard($attached_payment_method, $request);
                     }
+                    // attach card with customer
+                    $attached_payment_method = Payment::attachPaymentMethodToCustomer($retrieved_payment_method->id, $request);
+
+                    return $this->saveCard($attached_payment_method, $request);
+
                     break;
 
                 case 'razorpay':

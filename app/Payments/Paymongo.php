@@ -14,7 +14,7 @@ use Modules\Payment\Traits\PaymentTrait;
 use Stripe\Exception\SignatureVerificationException;
 use Throwable;
 
-final class Paymongo extends Base implements PaymentInterface
+class Paymongo extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

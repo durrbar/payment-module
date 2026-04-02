@@ -10,7 +10,7 @@ use Modules\Payment\Models\Payment;
 use RuntimeException;
 use Tests\TestCase;
 
-final class BasePaymentDriverTest extends TestCase
+class BasePaymentDriverTest extends TestCase
 {
     public function test_process_payment_status_returns_error_for_empty_inputs(): void
     {

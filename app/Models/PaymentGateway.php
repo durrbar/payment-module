@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,15 +14,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Ecommerce\Traits\TranslationTrait;
 use Modules\User\Models\User;
 
+#[Table('payment_gateways')]
+#[Unguarded]
 class PaymentGateway extends Model
 {
     use HasUuids;
     use SoftDeletes;
     use TranslationTrait;
-
-    protected $table = 'payment_gateways';
-
-    public $guarded = [];
 
     public function payment_methods(): HasMany
     {

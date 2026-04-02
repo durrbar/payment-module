@@ -8,7 +8,7 @@ use Modules\Order\Events\OrderCreatedEvent;
 use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Services\PaymentService;
 
-final class OrderCreatedListener
+class OrderCreatedListener
 {
     private PaymentService $paymentService;
 

@@ -13,7 +13,7 @@ use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Traits\PaymentTrait;
 use Throwable;
 
-final class Sslcommerz extends Base implements PaymentInterface
+class Sslcommerz extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

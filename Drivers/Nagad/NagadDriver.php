@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Drivers\Nagad;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Modules\Payment\Drivers\BasePaymentDriver;
 use Modules\Payment\Drivers\Nagad\Exceptions\NagadException;
@@ -75,7 +78,7 @@ class NagadDriver extends BasePaymentDriver
         $response = $this->refund($payment->bank_tran_id, $payment->amount);
 
         if ($response['status'] !== 'SUCCESS') {
-            throw new \Exception('Refund failed');
+            throw new Exception('Refund failed');
         }
 
         return [
@@ -149,6 +152,16 @@ class NagadDriver extends BasePaymentDriver
                 'message' => 'Transaction cancelled. Order status updated to Cancelled.',
             ];
         });
+    }
+
+    protected function headers()
+    {
+        return [
+            'Content-Type' => 'application/json',
+            'X-KM-IP-V4' => $this->getIp(),
+            'X-KM-Api-Version' => 'v-0.2.0',
+            'X-KM-Client-Type' => 'PC_WEB',
+        ];
     }
 
     private function initializeBaseUrl()
@@ -261,16 +274,6 @@ class NagadDriver extends BasePaymentDriver
     private function sendRequest(string $url, array $data)
     {
         return Http::withHeaders($this->headers())->post($url, $data);
-    }
-
-    protected function headers()
-    {
-        return [
-            'Content-Type' => 'application/json',
-            'X-KM-IP-V4' => $this->getIp(),
-            'X-KM-Api-Version' => 'v-0.2.0',
-            'X-KM-Client-Type' => 'PC_WEB',
-        ];
     }
 
     private function validatePayment(array $payment): void

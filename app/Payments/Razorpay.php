@@ -16,7 +16,7 @@ use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-final class Razorpay extends Base implements PaymentInterface
+class Razorpay extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

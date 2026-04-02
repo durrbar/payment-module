@@ -13,7 +13,7 @@ use Modules\Payment\Repositories\PaymentRepository;
 use Modules\Payment\Services\PaymentService;
 use Tests\TestCase;
 
-final class PaymentServiceTest extends TestCase
+class PaymentServiceTest extends TestCase
 {
     protected PaymentService $paymentService;
 

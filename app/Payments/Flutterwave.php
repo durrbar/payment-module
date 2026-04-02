@@ -14,7 +14,7 @@ use Modules\Payment\Enums\PaymentStatus;
 use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 
-final class Flutterwave extends Base implements PaymentInterface
+class Flutterwave extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

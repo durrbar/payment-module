@@ -26,7 +26,7 @@ use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 use Throwable;
 
-final class Iyzico extends Base implements PaymentInterface
+class Iyzico extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

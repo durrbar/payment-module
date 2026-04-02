@@ -1,5 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+use Modules\Invoice\Models\Invoice;
+use Modules\Order\Models\Order;
+use Modules\Payment\Drivers\DBBLRocketDriver;
+use Modules\Payment\Drivers\IslamicWalletDriver;
+use Modules\Payment\Drivers\MCashDriver;
+use Modules\Payment\Drivers\MYCashDriver;
+use Modules\Payment\Drivers\Nagad\NagadDriver;
+use Modules\Payment\Drivers\PortWalletDriver;
+use Modules\Payment\Drivers\SureCashDriver;
+use Modules\Payment\Drivers\Upay\UpayDriver;
+
 return [
     'name' => 'Payment',
 
@@ -10,7 +23,7 @@ return [
 
     'providers' => [
         'nagad' => [
-            'driver' => \Modules\Payment\Drivers\Nagad\NagadDriver::class,
+            'driver' => NagadDriver::class,
             'sandbox' => env('NAGAD_SANDBOX', true),
             'merchant_id' => env('NAGAD_MERCHANT_ID'),
             'merchant_number' => env('NAGAD_MERCHANT_NUMBER', ''),
@@ -21,7 +34,7 @@ return [
             'response_type' => 'html',
         ],
         'upay' => [
-            'driver' => \Modules\Payment\Drivers\Upay\UpayDriver::class,
+            'driver' => UpayDriver::class,
             'sandbox' => env('UPAY_SANDBOX', false),
             'server_ip' => env('UPAY_SERVER_IP', ''),
             'merchant_id' => env('UPAY_MERCHANT_ID', ''),
@@ -34,25 +47,25 @@ return [
             'redirect_url' => env('UPAY_CALLBACK_URL', ''),
         ],
         'dbblrocket' => [
-            'driver' => \Modules\Payment\Drivers\DBBLRocketDriver::class,
+            'driver' => DBBLRocketDriver::class,
         ],
         'islamicwallet' => [
-            'driver' => \Modules\Payment\Drivers\IslamicWalletDriver::class,
+            'driver' => IslamicWalletDriver::class,
         ],
         'mcash' => [
-            'driver' => \Modules\Payment\Drivers\MCashDriver::class,
+            'driver' => MCashDriver::class,
         ],
         'mycash' => [
-            'driver' => \Modules\Payment\Drivers\MYCashDriver::class,
+            'driver' => MYCashDriver::class,
         ],
         'portwallet' => [
-            'driver' => \Modules\Payment\Drivers\PortWalletDriver::class,
+            'driver' => PortWalletDriver::class,
             'store_id',
             'store_password',
             'sandbox',
         ],
         'surecash' => [
-            'driver' => \Modules\Payment\Drivers\SureCashDriver::class,
+            'driver' => SureCashDriver::class,
         ],
     ],
 
@@ -62,10 +75,10 @@ return [
         'company_address' => env('INVOICE_COMPANY_ADDRESS', 'Your Address'),
         'tax_percentage' => env('INVOICE_TAX_PERCENTAGE', 10),
 
-        'model' => env('INVOICE_MODEL', \Modules\Invoice\Models\Invoice::class),
+        'model' => env('INVOICE_MODEL', Invoice::class),
     ],
 
     'order' => [
-        'model' => env('ORDER_MODEL', \Modules\Order\Models\Order::class),
+        'model' => env('ORDER_MODEL', Order::class),
     ],
 ];

@@ -13,7 +13,7 @@ use Modules\Payment\Traits\PaymentTrait;
 use Xendit\Invoice;
 use Xendit\Xendit as XenditFacade;
 
-final class Xendit extends Base implements PaymentInterface
+class Xendit extends Base implements PaymentInterface
 {
     use PaymentTrait;
 

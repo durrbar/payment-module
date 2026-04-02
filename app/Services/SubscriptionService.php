@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Services;
 
 use Carbon\Carbon;
 
 class SubscriptionService
 {
-    protected $plans;
+    private $plans;
 
     public function __construct()
     {

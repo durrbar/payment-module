@@ -12,7 +12,7 @@ use Modules\Payment\Exceptions\InvalidProviderException;
 use Modules\Payment\Models\Payment;
 use Modules\Payment\Repositories\PaymentRepository;
 
-final class PaymentService
+class PaymentService
 {
     /**
      * Boundary rule:

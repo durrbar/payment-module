@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Repositories;
 
 use Modules\Payment\Drivers\BasePaymentDriver;

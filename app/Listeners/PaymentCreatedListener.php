@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Payment\Listeners;
 
 use Modules\Payment\Events\PaymentCreatedBroadcastEvent;
@@ -8,7 +10,7 @@ use Modules\Payment\Services\PaymentService;
 
 class PaymentCreatedListener
 {
-    protected PaymentService $paymentService;
+    private PaymentService $paymentService;
 
     /**
      * Create the event listener.

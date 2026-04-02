@@ -18,7 +18,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
 
-final class PaymentServiceProvider extends ServiceProvider
+class PaymentServiceProvider extends ServiceProvider
 {
     use PathNamespace;
 

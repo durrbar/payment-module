@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Payment\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +16,7 @@ use Modules\Payment\Observers\PaymentObserver;
 // use Modules\Payment\Database\Factories\PaymentFactory;
 
 #[ObservedBy([PaymentObserver::class])]
+#[Fillable([])]
 class Payment extends Model
 {
     use HasFactory;
@@ -24,11 +26,6 @@ class Payment extends Model
      * Boundary rule:
      * `status` column here uses PaymentStatusOld values, not PaymentStatus.
      */
-
-    /**
-     * The attributes that are mass assignable.
-     */
-    protected $fillable = [];
 
     // protected static function newFactory(): PaymentFactory
     // {
