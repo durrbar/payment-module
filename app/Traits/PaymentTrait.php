@@ -269,9 +269,7 @@ trait PaymentTrait
 
             if (! $this->customerAlreadyExists($request->user()->id, $selected_payment_gateway)) {
                 $customer = Payment::createCustomer($request);
-                $validGateways = array_column(PaymentGatewayType::cases(), 'value');
-
-                if (in_array($selected_payment_gateway, $validGateways, true)) {
+                if (PaymentGatewayType::tryFrom($selected_payment_gateway) !== null) {
                     PaymentGateway::create([
                         'user_id' => $request->user()->id,
                         'customer_id' => $customer['customer_id'],

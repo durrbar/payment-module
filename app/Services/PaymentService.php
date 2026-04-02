@@ -32,9 +32,8 @@ class PaymentService
     public function createPayment(Order $order, ?string $status = null): Payment
     {
         $status = $status ?? PaymentStatusOld::PENDING->value;
-        $validStatuses = array_column(PaymentStatusOld::cases(), 'value');
 
-        if (! in_array($status, $validStatuses, true)) {
+        if (PaymentStatusOld::tryFrom($status) === null) {
             throw new InvalidArgumentException("Invalid legacy payment status [{$status}] provided.");
         }
 
