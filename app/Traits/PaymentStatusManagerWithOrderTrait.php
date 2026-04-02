@@ -10,6 +10,7 @@ use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Order\Traits\OrderStatusManagerWithPaymentTrait;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Facades\Payment;
 use Modules\Settings\Models\Settings;
 use Throwable;
@@ -99,7 +100,7 @@ trait PaymentStatusManagerWithOrderTrait
                 if ($payment) {
                     $paymentStatus = $payment['status'];
                     switch (mb_strtolower($paymentStatus)) {
-                        case 'completed':
+                        case PaymentStatusOld::COMPLETED->value:
                             $this->paymentSuccess($order);
                             break;
                         case 'payer_action_required':
@@ -143,7 +144,7 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'attempted':
                             $this->paymentProcessing($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -180,10 +181,10 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
-                        case 'pending':
+                        case PaymentStatusOld::PENDING->value:
                             $this->paymentAwaitingForApproval($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -218,10 +219,10 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'validated':
                             $this->paymentSuccess($order);
                             break;
-                        case 'pending':
+                        case PaymentStatusOld::PENDING->value:
                             $this->paymentAwaitingForApproval($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -258,7 +259,7 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'success':
                             $this->paymentSuccess($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -289,7 +290,7 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'success':
                             $this->paymentSuccess($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                             // no break
                         case 'init_threeds':
@@ -331,7 +332,7 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'paid':
                             $this->paymentSuccess($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -364,10 +365,10 @@ trait PaymentStatusManagerWithOrderTrait
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
                     switch (mb_strtolower($paymentStatus)) {
-                        case 'completed':
+                        case PaymentStatusOld::COMPLETED->value:
                             $this->paymentSuccess($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -406,10 +407,10 @@ trait PaymentStatusManagerWithOrderTrait
                         case 'chargeable':
                             $this->paymentAwaitingForApproval($order);
                             break;
-                        case 'pending':
+                        case PaymentStatusOld::PENDING->value:
                             $this->paymentAwaitingForApproval($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }
@@ -442,10 +443,10 @@ trait PaymentStatusManagerWithOrderTrait
                 $paymentStatus = Payment::verify($paymentId);
                 if ($paymentStatus) {
                     switch (mb_strtolower($paymentStatus)) {
-                        case 'successful':
+                        case PaymentStatusOld::SUCCESSFUL->value:
                             $this->paymentSuccess($order);
                             break;
-                        case 'failed':
+                        case PaymentStatusOld::FAILED->value:
                             $this->paymentFailed($order);
                     }
                 }

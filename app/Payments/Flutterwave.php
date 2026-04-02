@@ -11,6 +11,7 @@ use Modules\Core\Exceptions\DurrbarException;
 use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 
@@ -115,7 +116,7 @@ class Flutterwave extends Base implements PaymentInterface
         try {
             $verified = FlutterwaveFacade::verifyWebhook();
 
-            if ($verified && $request->event === 'charge.completed' && $request->data['status'] === 'successful') {
+            if ($verified && $request->event === 'charge.completed' && $request->data['status'] === PaymentStatusOld::SUCCESSFUL->value) {
                 $verificationData = FlutterwaveFacade::verifyTransaction($request->data['id']);
                 if ($verificationData['status'] === 'success') {
                     $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);

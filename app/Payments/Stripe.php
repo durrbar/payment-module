@@ -9,6 +9,7 @@ use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Order\Traits\OrderStatusManagerWithPaymentTrait;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Traits\PaymentTrait;
 use Stripe\Exception\ApiConnectionException;
 use Stripe\Exception\ApiErrorException;
@@ -324,7 +325,7 @@ class Stripe extends Base implements PaymentInterface
                     $this->webhookSuccessResponse($order, OrderStatus::Processing->value, PaymentStatus::Success->value);
                     break;
 
-                case 'pending':
+                case PaymentStatusOld::PENDING->value:
                     // code...
                     // Throw email to admin that order is pending.
                     // Throw email to user that order is pending.
@@ -334,7 +335,7 @@ class Stripe extends Base implements PaymentInterface
                     $this->orderStatusManagementOnPayment($order, OrderStatus::Pending->value, PaymentStatus::AwaitingForApproval->value);
                     break;
 
-                case 'failed':
+                case PaymentStatusOld::FAILED->value:
                     // code...
                     // Throw email to admin that order is pending.
                     // Throw email to user that order is failure.

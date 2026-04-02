@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Traits\PaymentTrait;
 use Razorpay\Api\Errors\SignatureVerificationError;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -96,10 +97,10 @@ class Paystack extends Base implements PaymentInterface
             case 'success':
                 $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
-            case 'pending':
+            case PaymentStatusOld::PENDING->value:
                 $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
                 break;
-            case 'failed':
+            case PaymentStatusOld::FAILED->value:
                 $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
                 break;
         }

@@ -9,6 +9,7 @@ use Modules\Core\Exceptions\DurrbarException;
 use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Traits\PaymentTrait;
 use Xendit\Invoice;
 use Xendit\Xendit as XenditFacade;
@@ -89,10 +90,10 @@ class Xendit extends Base implements PaymentInterface
             case 'paid':
                 $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
-            case 'pending':
+            case PaymentStatusOld::PENDING->value:
                 $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Pending->value);
                 break;
-            case 'failed':
+            case PaymentStatusOld::FAILED->value:
                 $this->updatePaymentOrderStatus($request, OrderStatus::Failed->value, PaymentStatus::Failed->value);
                 break;
         }
