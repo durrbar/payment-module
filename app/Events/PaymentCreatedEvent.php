@@ -11,8 +11,5 @@ class PaymentCreatedEvent
 {
     use Dispatchable;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(public readonly Payment $payment) {}
 }

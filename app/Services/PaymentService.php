@@ -19,10 +19,7 @@ class PaymentService
      * - `payments.status` is validated against PaymentStatusOld.
      * - PaymentStatus is a separate workflow enum and must not be written to `payments.status`.
      */
-    public function __construct(private readonly PaymentRepository $paymentRepository)
-    {
-        //
-    }
+    public function __construct(private readonly PaymentRepository $paymentRepository) {}
 
     /**
      * Create a payment record for an order.
@@ -102,7 +99,7 @@ class PaymentService
     /**
      * Handle IPN (Instant Payment Notification) from the payment provider.
      */
-    public function handleIPN(array $data, ?string $provider)
+    public function handleIPN(array $data, ?string $provider): mixed
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -117,7 +114,7 @@ class PaymentService
     /**
      * Handle success notification from the payment provider.
      */
-    public function handleSuccess(array $data, ?string $provider)
+    public function handleSuccess(array $data, ?string $provider): mixed
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -132,7 +129,7 @@ class PaymentService
     /**
      * Handle failure notification from the payment provider.
      */
-    public function handleFailure(array $data, ?string $provider)
+    public function handleFailure(array $data, ?string $provider): mixed
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -147,7 +144,7 @@ class PaymentService
     /**
      * Handle cancel notification from the payment provider.
      */
-    public function handleCancel(array $data, ?string $provider)
+    public function handleCancel(array $data, ?string $provider): mixed
     {
         try {
             $providerInstance = $this->resolveProvider($provider);
@@ -170,7 +167,7 @@ class PaymentService
     /**
      * Resolve the correct payment provider.
      */
-    private function resolveProvider(?string $providerName = null)
+    private function resolveProvider(?string $providerName = null): mixed
     {
         if (! $providerName) {
             // Fetch the default provider if none is supplied

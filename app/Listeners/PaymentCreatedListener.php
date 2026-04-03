@@ -10,20 +10,12 @@ use Modules\Payment\Services\PaymentService;
 
 class PaymentCreatedListener
 {
-    /**
-     * Create the event listener.
-     */
     public function __construct(private readonly PaymentService $paymentService) {}
 
-    /**
-     * Handle the event.
-     */
     public function handle(PaymentCreatedEvent $event): void
     {
-        // Delegate payment initiation
         $this->paymentService->initiatePayment($event->payment->tran_id, $event->payment->provider);
 
-        // Dispatch a broadcast event
         event(new PaymentCreatedBroadcastEvent(
             $event->payment->order->customer->id,
             $event->payment->order->id,

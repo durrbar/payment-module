@@ -9,8 +9,5 @@ use Modules\Order\Models\Order;
 
 class PaymentFailed implements ShouldQueue
 {
-    /**
-     * Create a new event instance.
-     */
     public function __construct(public readonly Order $order) {}
 }

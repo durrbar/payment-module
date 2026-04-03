@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Payment\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -22,13 +23,12 @@ class PaymentCreatedBroadcastEvent implements ShouldBroadcast
         public string $redirectUrl
     ) {}
 
-    public function broadcastOn()
+    public function broadcastOn(): Channel|array
     {
         return new PrivateChannel('PaymentCreated.'.$this->customerId);
     }
 
-    // Optional: Define broadcast queue name
-    public function broadcastQueue()
+    public function broadcastQueue(): string
     {
         return 'broadcasts';
     }

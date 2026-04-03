@@ -9,8 +9,5 @@ use Modules\Payment\Models\PaymentMethod;
 
 class PaymentMethods implements ShouldQueue
 {
-    /**
-     * Create a new event instance.
-     */
     public function __construct(public readonly PaymentMethod $payment_methods) {}
 }

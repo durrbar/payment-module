@@ -11,10 +11,5 @@ class PaymentSuccessEvent
 {
     use Dispatchable;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param  Payment  $order
-     */
     public function __construct(public readonly Payment $payment) {}
 }

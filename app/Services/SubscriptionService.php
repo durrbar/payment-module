@@ -8,26 +8,20 @@ use Carbon\Carbon;
 
 class SubscriptionService
 {
-    private $plans;
-
-    public function __construct()
-    {
-        // Define subscription plans
-        $this->plans = [
-            'basic' => [
-                'price' => 10.00,
-                'duration' => 30, // Days
-            ],
-            'premium' => [
-                'price' => 25.00,
-                'duration' => 90, // Days
-            ],
-            'annual' => [
-                'price' => 100.00,
-                'duration' => 365, // Days
-            ],
-        ];
-    }
+    private array $plans = [
+        'basic' => [
+            'price' => 10.00,
+            'duration' => 30,
+        ],
+        'premium' => [
+            'price' => 25.00,
+            'duration' => 90,
+        ],
+        'annual' => [
+            'price' => 100.00,
+            'duration' => 365,
+        ],
+    ];
 
     public function subscribe(string $plan, string $userId): array
     {
