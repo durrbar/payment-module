@@ -19,7 +19,7 @@ class PaymentService
      * - `payments.status` is validated against PaymentStatusOld.
      * - PaymentStatus is a separate workflow enum and must not be written to `payments.status`.
      */
-    public function __construct(private PaymentRepository $paymentRepository)
+    public function __construct(private readonly PaymentRepository $paymentRepository)
     {
         //
     }
