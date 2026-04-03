@@ -16,18 +16,11 @@ class PaymentCreatedBroadcastEvent implements ShouldBroadcast
 
     public string $message = 'Payment successfully created!';
 
-    public string $orderId;
-
-    public string $redirectUrl;
-
-    private string $customerId;
-
-    public function __construct(string $customerId, string $orderId, string $redirectUrl)
-    {
-        $this->customerId = $customerId;
-        $this->orderId = $orderId;
-        $this->redirectUrl = $redirectUrl;
-    }
+    public function __construct(
+        private string $customerId,
+        public string $orderId,
+        public string $redirectUrl
+    ) {}
 
     public function broadcastOn()
     {
