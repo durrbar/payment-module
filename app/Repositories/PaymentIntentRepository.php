@@ -44,7 +44,6 @@ class PaymentIntentRepository extends BaseRepository
     /**
      * getPaymentIntent
      *
-     * @return void
      */
     public function getPaymentIntent(mixed $request, mixed $settings): mixed
     {

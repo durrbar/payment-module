@@ -95,7 +95,6 @@ class Payment
      * handleWebHooks
      *
      * @param  object  $request
-     * @return void
      */
     public function handleWebHooks($request)
     {

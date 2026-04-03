@@ -30,7 +30,6 @@ class PaymentIntentController extends CoreController
      * So that, if the intent was kept track in any case for current or future payment.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function getPaymentIntent(Request $request)
     {

@@ -31,7 +31,6 @@ class Flutterwave extends Base implements PaymentInterface
      *  Flutterwave callback
      *
      * @param  mixed  $request
-     * @return void
      */
     public static function callback(Request $request)
     {

@@ -334,7 +334,6 @@ trait PaymentTrait
      * @param  mixed  $order
      * @param  string  $order_status
      * @param  string  $payment_status
-     * @return void
      */
     public function webhookSuccessResponse($order, $order_status, $payment_status)
     {

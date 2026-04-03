@@ -22,7 +22,6 @@ class Mollie extends Base implements PaymentInterface
     /**
      * __construct
      *
-     * @return void
      */
     public function __construct()
     {

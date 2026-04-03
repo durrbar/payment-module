@@ -46,7 +46,6 @@ class PaymentMethodController extends CoreController
      * Get all the available payment method (e.g. Card) of current customer.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function index(Request $request)
     {
@@ -62,7 +61,6 @@ class PaymentMethodController extends CoreController
      * Create & store the payment method (e.g. Card) and store the only available & safe information in database.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function store(PaymentMethodCreateRequest $request)
     {
@@ -78,7 +76,6 @@ class PaymentMethodController extends CoreController
      *
      * Delete Payment method (e.g. Card) from a user.
      *
-     * @return void
      *
      * @throws Exception
      */
@@ -112,7 +109,6 @@ class PaymentMethodController extends CoreController
      * It can be used, in case of payment methods where cards can be saved.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function savePaymentMethod(Request $request)
     {
@@ -129,7 +125,6 @@ class PaymentMethodController extends CoreController
      * Save payment method (e.g. Card) for future usages.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function saveCardIntent(Request $request)
     {
@@ -148,7 +143,6 @@ class PaymentMethodController extends CoreController
      * This method initiate the functionalities to set a payment method (e.g. Card) as a default for any user.
      *
      * @param  mixed  $request
-     * @return void
      */
     public function setDefaultCard(Request $request)
     {

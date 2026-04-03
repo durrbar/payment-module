@@ -38,7 +38,6 @@ class PaymentMethodCreateRequest extends FormRequest
      * failedValidation
      *
      * @param  mixed  $validator
-     * @return void
      */
     public function failedValidation(Validator $validator): void
     {

@@ -53,7 +53,6 @@ class PaymentMethodRepository extends BaseRepository
      * setStripeIntent
      *
      * @param  mixed  $request
-     * @return void
      */
     public function setStripeIntent($request)
     {
@@ -94,7 +93,6 @@ class PaymentMethodRepository extends BaseRepository
      *
      * @param  mixed  $request
      * @param  mixed  $settings
-     * @return void
      */
     public function storeCards($request)
     {
@@ -125,7 +123,6 @@ class PaymentMethodRepository extends BaseRepository
      * setDefaultPaymentMethod
      *
      * @param  mixed  $request
-     * @return void
      */
     public function setDefaultPaymentMethod($request)
     {

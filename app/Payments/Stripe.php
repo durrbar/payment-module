@@ -34,7 +34,6 @@ class Stripe extends Base implements PaymentInterface
     /**
      * __construct
      *
-     * @return void
      */
     public function __construct()
     {
@@ -311,7 +310,6 @@ class Stripe extends Base implements PaymentInterface
      * paymentGatewayWebHookResponse
      *
      * @param  array  $data
-     * @return void
      */
     public function paymentGatewayWebHookResponse($data)
     {
