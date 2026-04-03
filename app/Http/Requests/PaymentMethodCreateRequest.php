@@ -15,7 +15,7 @@ class PaymentMethodCreateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -25,7 +25,7 @@ class PaymentMethodCreateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'method_key' => ['required', 'string'],
@@ -40,7 +40,7 @@ class PaymentMethodCreateRequest extends FormRequest
      * @param  mixed  $validator
      * @return void
      */
-    public function failedValidation(Validator $validator)
+    public function failedValidation(Validator ): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
