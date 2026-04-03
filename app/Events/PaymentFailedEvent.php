@@ -11,13 +11,8 @@ class PaymentFailedEvent
 {
     use Dispatchable;
 
-    public Order $order;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(Order $order)
-    {
-        $this->order = $order;
-    }
+    public function __construct(public Order $order) {}
 }

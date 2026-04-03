@@ -11,15 +11,10 @@ class PaymentSuccessEvent
 {
     use Dispatchable;
 
-    public Payment $payment;
-
     /**
      * Create a new event instance.
      *
      * @param  Payment  $order
      */
-    public function __construct(Payment $payment)
-    {
-        $this->payment = $payment;
-    }
+    public function __construct(public Payment $payment) {}
 }

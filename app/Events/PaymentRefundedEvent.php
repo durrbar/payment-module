@@ -11,13 +11,8 @@ class PaymentRefundedEvent
 {
     use Dispatchable;
 
-    public $payment;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(Payment $payment)
-    {
-        $this->payment = $payment;
-    }
+    public function __construct(public Payment $payment) {}
 }
