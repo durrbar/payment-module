@@ -11,63 +11,68 @@ use Modules\Payment\Payments\Flutterwave;
 
 class WebHookController extends CoreController
 {
-    public function stripe(Request $request)
+    public function stripe(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function paypal(Request $request)
+    public function paypal(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function razorpay(Request $request)
+    public function razorpay(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function mollie(Request $request)
+    public function mollie(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function sslcommerz(Request $request)
+    public function sslcommerz(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function paystack(Request $request)
+    public function paystack(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function paymongo(Request $request)
+    public function paymongo(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function xendit(Request $request)
+    public function xendit(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function iyzico(Request $request)
+    public function iyzico(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function bkash(Request $request)
+    public function bkash(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function flutterwave(Request $request)
+    public function flutterwave(Request $request): mixed
     {
-        return Payment::handleWebHooks($request);
+        return $this->handleWebhook($request);
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request): mixed
     {
         return Flutterwave::callback($request);
+    }
+
+    private function handleWebhook(Request $request): mixed
+    {
+        return Payment::handleWebHooks($request);
     }
 }

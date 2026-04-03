@@ -14,8 +14,8 @@ use Modules\Settings\Models\Settings;
 class PaymentIntentController extends CoreController
 {
     public function __construct(
-        public readonly PaymentIntentRepository $repository,
-        public readonly ?Settings $settings = null
+        private readonly PaymentIntentRepository $repository,
+        private ?Settings $settings = null
     ) {
         $this->settings ??= Settings::first();
     }
@@ -26,9 +26,8 @@ class PaymentIntentController extends CoreController
      * This function create the payment intent for the payment & store that into database with related to that order.
      * So that, if the intent was kept track in any case for current or future payment.
      *
-     * @param  mixed  $request
      */
-    public function getPaymentIntent(Request $request)
+    public function getPaymentIntent(Request $request): mixed
     {
         try {
             if (! auth()->check() && ! $this->settings->options['guestCheckout']) {

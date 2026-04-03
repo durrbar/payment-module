@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Payment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Closure;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -135,7 +136,7 @@ class PaymentController extends Controller
     /**
      * Centralized error handling for payment service methods.
      */
-    private function handlePaymentServiceMethod(callable $method): mixed
+    private function handlePaymentServiceMethod(Closure $method): mixed
     {
         try {
             return $method();

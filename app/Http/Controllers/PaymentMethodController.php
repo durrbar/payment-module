@@ -21,8 +21,8 @@ class PaymentMethodController extends CoreController
     use PaymentTrait;
 
     public function __construct(
-        public readonly PaymentMethodRepository $repository,
-        public readonly ?Settings $settings = null
+        private readonly PaymentMethodRepository $repository,
+        private ?Settings $settings = null
     ) {
         $this->settings ??= Settings::first();
     }
@@ -32,9 +32,8 @@ class PaymentMethodController extends CoreController
      *
      * Get all the available payment method (e.g. Card) of current customer.
      *
-     * @param  mixed  $request
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         // currently stripe has only card saving feature available. So, it's hardcoded here. In case of future it can be processed based on the selected payment gateway for saving cards
         $user = $request->user();
@@ -47,9 +46,8 @@ class PaymentMethodController extends CoreController
      *
      * Create & store the payment method (e.g. Card) and store the only available & safe information in database.
      *
-     * @param  mixed  $request
      */
-    public function store(PaymentMethodCreateRequest $request)
+    public function store(PaymentMethodCreateRequest $request): mixed
     {
         try {
             return $this->repository->storeCards($request, $this->settings);
@@ -66,21 +64,19 @@ class PaymentMethodController extends CoreController
      *
      * @throws Exception
      */
-    public function destroy(Request $request, mixed $id)
+    public function destroy(Request $request, string $id): mixed
     {
-        $request->id = $id;
-
-        return $this->deletePaymentMethod($request);
+        return $this->deletePaymentMethod($id);
     }
 
-    public function deletePaymentMethod(Request $request)
+    public function deletePaymentMethod(string $id): mixed
     {
         try {
             try {
-                $retrieved_payment_method = PaymentMethod::where('id', '=', $request->id)->first();
+                $retrieved_payment_method = PaymentMethod::where('id', $id)->first();
                 Payment::detachPaymentMethodToCustomer($retrieved_payment_method->method_key);
 
-                return $this->repository->findOrFail($request->id)->forceDelete();
+                return $this->repository->findOrFail($id)->forceDelete();
             } catch (Exception $e) {
                 throw new HttpException(409, COULD_NOT_DELETE_THE_RESOURCE);
             }
@@ -95,14 +91,14 @@ class PaymentMethodController extends CoreController
      * When creating a payment method (e.g Card) during checkout, it needs to generate that payment method identifier.
      * It can be used, in case of payment methods where cards can be saved.
      *
-     * @param  mixed  $request
      */
-    public function savePaymentMethod(Request $request)
+    public function savePaymentMethod(Request $request): mixed
     {
         switch ($request->payment_gateway) {
             case 'stripe':
                 return $this->repository->saveStripeCard($request);
-                break;
+            default:
+                return null;
         }
     }
 
@@ -111,14 +107,14 @@ class PaymentMethodController extends CoreController
      *
      * Save payment method (e.g. Card) for future usages.
      *
-     * @param  mixed  $request
      */
-    public function saveCardIntent(Request $request)
+    public function saveCardIntent(Request $request): mixed
     {
+        $setupIntent = null;
+
         switch ($this->settings->options['paymentGateway']) {
             case 'stripe':
                 $setupIntent = $this->repository->setStripeIntent($request);
-                break;
         }
 
         return $setupIntent;
@@ -129,9 +125,8 @@ class PaymentMethodController extends CoreController
      *
      * This method initiate the functionalities to set a payment method (e.g. Card) as a default for any user.
      *
-     * @param  mixed  $request
      */
-    public function setDefaultCard(Request $request)
+    public function setDefaultCard(Request $request): mixed
     {
         try {
             return $this->repository->setDefaultPaymentMethod($request);

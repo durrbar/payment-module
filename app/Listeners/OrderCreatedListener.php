@@ -14,9 +14,6 @@ class OrderCreatedListener
 
     public function handle(OrderCreatedEvent $event): void
     {
-        $order = $event->order;
-
-        // Create a payment record (mark as pending initially)
-        $this->paymentService->createPayment($order, PaymentStatusOld::PENDING->value);
+        $this->paymentService->createPayment($event->order, PaymentStatusOld::PENDING->value);
     }
 }
