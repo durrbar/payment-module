@@ -16,17 +16,12 @@ use Modules\Payment\Services\PaymentService;
 
 class PaymentController extends Controller
 {
-    protected PaymentService $paymentService;
-
-    public function __construct(PaymentService $paymentService)
-    {
-        $this->paymentService = $paymentService;
-    }
+    public function __construct(protected readonly PaymentService $paymentService) {}
 
     /**
      * Make payment through the selected provider.
      */
-    public function makePayment(PaymentRequest $request)
+    public function makePayment(PaymentRequest $request): mixed
     {
         $validated = $request->validated();
 
@@ -43,7 +38,7 @@ class PaymentController extends Controller
     /**
      * Verify the payment transaction with the selected provider.
      */
-    public function verifyPayment(Request $request, $transactionId)
+    public function verifyPayment(Request $request, string $transactionId): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($transactionId, $request) {
             $response = $this->paymentService->verifyPayment($transactionId, $request->input('provider'));
@@ -55,7 +50,7 @@ class PaymentController extends Controller
     /**
      * Refund a payment with the selected provider.
      */
-    public function refundPayment(RefundRequest $request)
+    public function refundPayment(RefundRequest $request): mixed
     {
         $validated = $request->validated();
 
@@ -73,7 +68,7 @@ class PaymentController extends Controller
     /**
      * Apply a discount to the amount.
      */
-    public function applyDiscount(Request $request)
+    public function applyDiscount(Request $request): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($request) {
             $discountService = app(DiscountService::class);
@@ -92,7 +87,7 @@ class PaymentController extends Controller
     /**
      * Handle IPN (Instant Payment Notification).
      */
-    public function ipn(Request $request, string $provider)
+    public function ipn(Request $request, string $provider): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleIPN($request->all(), $provider);
@@ -104,7 +99,7 @@ class PaymentController extends Controller
     /**
      * Handle success payment notification.
      */
-    public function success(Request $request, string $provider)
+    public function success(Request $request, string $provider): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleSuccess($request->all(), $provider);
@@ -116,7 +111,7 @@ class PaymentController extends Controller
     /**
      * Handle failed payment notification.
      */
-    public function fail(Request $request, string $provider)
+    public function fail(Request $request, string $provider): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleFailure($request->all(), $provider);
@@ -128,7 +123,7 @@ class PaymentController extends Controller
     /**
      * Handle canceled payment notification.
      */
-    public function cancel(Request $request, string $provider)
+    public function cancel(Request $request, string $provider): mixed
     {
         return $this->handlePaymentServiceMethod(function () use ($request, $provider) {
             $response = $this->paymentService->handleCancel($request->all(), $provider);
@@ -140,7 +135,7 @@ class PaymentController extends Controller
     /**
      * Centralized error handling for payment service methods.
      */
-    private function handlePaymentServiceMethod(callable $method)
+    private function handlePaymentServiceMethod(callable $method): mixed
     {
         try {
             return $method();

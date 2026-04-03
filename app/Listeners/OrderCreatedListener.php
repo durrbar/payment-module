@@ -12,7 +12,7 @@ class OrderCreatedListener
 {
     public function __construct(private readonly PaymentService $paymentService) {}
 
-    public function handle(OrderCreatedEvent $event)
+    public function handle(OrderCreatedEvent $event): void
     {
         $order = $event->order;
 
