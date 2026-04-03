@@ -14,5 +14,5 @@ class PaymentCreatedEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(public Payment $payment) {}
+    public function __construct(public readonly Payment $payment) {}
 }

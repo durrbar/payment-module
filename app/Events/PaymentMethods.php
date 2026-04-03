@@ -12,5 +12,5 @@ class PaymentMethods implements ShouldQueue
     /**
      * Create a new event instance.
      */
-    public function __construct(public PaymentMethod $payment_methods) {}
+    public function __construct(public readonly PaymentMethod $payment_methods) {}
 }
