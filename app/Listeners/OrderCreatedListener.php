@@ -10,7 +10,7 @@ use Modules\Payment\Services\PaymentService;
 
 class OrderCreatedListener
 {
-    public function __construct(private PaymentService $paymentService) {}
+    public function __construct(private readonly PaymentService $paymentService) {}
 
     public function handle(OrderCreatedEvent $event)
     {

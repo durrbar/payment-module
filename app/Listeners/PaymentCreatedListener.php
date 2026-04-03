@@ -13,7 +13,7 @@ class PaymentCreatedListener
     /**
      * Create the event listener.
      */
-    public function __construct(private PaymentService $paymentService) {}
+    public function __construct(private readonly PaymentService $paymentService) {}
 
     /**
      * Handle the event.
