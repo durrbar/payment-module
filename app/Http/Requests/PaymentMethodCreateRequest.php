@@ -40,7 +40,7 @@ class PaymentMethodCreateRequest extends FormRequest
      * @param  mixed  $validator
      * @return void
      */
-    public function failedValidation(Validator ): void
+    public function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
