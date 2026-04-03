@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Payment\Enums\PaymentStatus;
+use Modules\Payment\Enums\PaymentStatusOld;
 use Modules\Payment\Models\PaymentIntent;
 use Modules\Payment\Traits\PaymentTrait;
 use Razorpay\Api\Api;
@@ -111,7 +112,7 @@ class Razorpay extends Base implements PaymentInterface
             case 'captured':
                 $this->updatePaymentOrderStatus($request, OrderStatus::Processing->value, PaymentStatus::Success->value);
                 break;
-            case 'failed':
+            case PaymentStatusOld::FAILED->value:
                 $this->updatePaymentOrderStatus($request, OrderStatus::Pending->value, PaymentStatus::Failed->value);
         }
 
