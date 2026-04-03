@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Modules\Payment\Drivers\BasePaymentDriver;
+use Modules\Payment\Drivers\Enums\DriverTransactionStatus;
 use Modules\Payment\Drivers\Nagad\Exceptions\NagadException;
 
 class NagadDriver extends BasePaymentDriver
@@ -66,7 +67,7 @@ class NagadDriver extends BasePaymentDriver
         }
 
         return [
-            'status' => 'success',
+            'status' => DriverTransactionStatus::Success->value,
             'tran_id' => $response['tran_id'],
             'amount' => $response['amount'],
             'currency' => $response['currency'],
@@ -82,7 +83,7 @@ class NagadDriver extends BasePaymentDriver
         }
 
         return [
-            'status' => 'success',
+            'status' => DriverTransactionStatus::Success->value,
             'tran_id' => $response['tran_id'],
             'refund_amount' => $response['refund_amount'],
         ];
@@ -97,13 +98,13 @@ class NagadDriver extends BasePaymentDriver
                 $this->updatePaymentStatus($details['tran_id'], 'Complete', []);
 
                 return [
-                    'status' => 'success',
+                    'status' => DriverTransactionStatus::Success->value,
                     'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.',
                 ];
             }
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction verification failed.',
             ];
         });
@@ -116,13 +117,13 @@ class NagadDriver extends BasePaymentDriver
                 $this->updatePaymentStatus($order_details['tran_id'], 'Processing', []);
 
                 return [
-                    'status' => 'success',
+                    'status' => DriverTransactionStatus::Success->value,
                     'message' => 'Transaction is successfully completed.',
                 ];
             }
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction verification failed.',
             ];
         });
@@ -135,7 +136,7 @@ class NagadDriver extends BasePaymentDriver
             $this->updatePaymentStatus($order_details['tran_id'], 'Failed', []);
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction failed. Order status updated to Failed.',
             ];
         });
@@ -148,7 +149,7 @@ class NagadDriver extends BasePaymentDriver
             $this->updatePaymentStatus($data['tran_id'], 'Cancelled', []);
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction cancelled. Order status updated to Cancelled.',
             ];
         });
