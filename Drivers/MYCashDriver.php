@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace Modules\Payment\Drivers;
 
+use Modules\Payment\Drivers\Enums\DriverTransactionStatus;
+
 class MYCashDriver extends BasePaymentDriver
 {
     public function initiatePayment(mixed $payment): array
     {
         // Logic to initiate payment with bKash
-        return ['status' => 'success', 'tran_id' => 'bkash_txn_67890'];
+        return ['status' => DriverTransactionStatus::Success->value, 'tran_id' => 'bkash_txn_67890'];
     }
 
     public function verifyPayment(string $transactionId): array
     {
         // Logic to verify payment with bKash
-        return ['status' => 'verified', 'tran_id' => $transactionId];
+        return ['status' => DriverTransactionStatus::Verified->value, 'tran_id' => $transactionId];
     }
 
     public function refundPayment(mixed $payment): array
     {
         // Logic to refund payment with bKash
-        return ['status' => 'refunded', 'tran_id' => $payment->transactionId];
+        return ['status' => DriverTransactionStatus::Refunded->value, 'tran_id' => $payment->transactionId];
     }
 
     public function handleIPN(array $data): array
@@ -33,13 +35,13 @@ class MYCashDriver extends BasePaymentDriver
                 $this->updatePaymentStatus($order_details['tran_id'], 'Complete', []);
 
                 return [
-                    'status' => 'success',
+                    'status' => DriverTransactionStatus::Success->value,
                     'message' => 'Transaction successfully processed via IPN. Order status updated to Complete.',
                 ];
             }
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction verification failed.',
             ];
         });
@@ -52,13 +54,13 @@ class MYCashDriver extends BasePaymentDriver
                 $this->updatePaymentStatus($order_details['tran_id'], 'Processing', []);
 
                 return [
-                    'status' => 'success',
+                    'status' => DriverTransactionStatus::Success->value,
                     'message' => 'Transaction is successfully completed.',
                 ];
             }
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction verification failed.',
             ];
         });
@@ -71,7 +73,7 @@ class MYCashDriver extends BasePaymentDriver
             $this->updatePaymentStatus($order_details['tran_id'], 'Failed', []);
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction failed. Order status updated to Failed.',
             ];
         });
@@ -84,7 +86,7 @@ class MYCashDriver extends BasePaymentDriver
             $this->updatePaymentStatus($data['tran_id'], 'Cancelled', []);
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Transaction cancelled. Order status updated to Cancelled.',
             ];
         });
