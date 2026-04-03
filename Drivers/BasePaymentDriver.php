@@ -7,6 +7,7 @@ namespace Modules\Payment\Drivers;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\Payment\Drivers\Enums\DriverTransactionStatus;
 use Modules\Payment\Enums\PaymentStatusOld as LegacyPaymentStatus;
 use Modules\Payment\Interfaces\PaymentDriverInterface;
 use Modules\Payment\Models\Payment;
@@ -53,7 +54,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
         // Validate and sanitize inputs
         if (empty($tranId) || empty($status)) {
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Invalid payment ID or status.',
             ];
         }
@@ -67,7 +68,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
             error_log("Payment not found for ID: $tranId");
 
             return [
-                'status' => 'error',
+                'status' => DriverTransactionStatus::Error->value,
                 'message' => 'Payment not found.',
             ];
         }
@@ -82,7 +83,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
                 error_log('Callback execution failed: '.$e->getMessage());
 
                 return [
-                    'status' => 'error',
+                    'status' => DriverTransactionStatus::Error->value,
                     'message' => 'An error occurred during callback execution.',
                 ];
             }
@@ -92,12 +93,12 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
         switch ($paymentDetails->status) {
             case LegacyPaymentStatus::PROCESSING->value:
                 return [
-                    'status' => 'error',
+                    'status' => DriverTransactionStatus::Error->value,
                     'message' => 'Transaction is already being processed.',
                 ];
             case LegacyPaymentStatus::COMPLETED->value:
                 return [
-                    'status' => 'error',
+                    'status' => DriverTransactionStatus::Error->value,
                     'message' => 'Transaction is already successfully completed.',
                 ];
             default:
@@ -105,7 +106,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
                 error_log('Unexpected payment status: '.$paymentDetails->status);
 
                 return [
-                    'status' => 'error',
+                    'status' => DriverTransactionStatus::Error->value,
                     'message' => 'Invalid transaction status.',
                 ];
         }
@@ -128,7 +129,7 @@ abstract class BasePaymentDriver implements PaymentDriverInterface
     final public function formatInitialPaymentResponse(string $status, ?string $redirectURL, string $message, array $response, string $provider): array
     {
         // Log an error if the status is 'error'
-        if ($status === 'error') {
+        if ($status === DriverTransactionStatus::Error->value) {
             Log::error($provider.' create payment failed', ['response' => $response]);
         }
 
