@@ -13,14 +13,11 @@ use Modules\Settings\Models\Settings;
 
 class PaymentIntentController extends CoreController
 {
-    public $repository;
-
-    public $settings;
-
-    public function __construct(PaymentIntentRepository $repository)
-    {
-        $this->repository = $repository;
-        $this->settings = Settings::first();
+    public function __construct(
+        public readonly PaymentIntentRepository $repository,
+        public readonly ?Settings $settings = null
+    ) {
+        $this->settings ??= Settings::first();
     }
 
     /**

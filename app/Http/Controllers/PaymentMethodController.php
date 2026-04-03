@@ -20,24 +20,11 @@ class PaymentMethodController extends CoreController
 {
     use PaymentTrait;
 
-    /**
-     * repository
-     *
-     * @var mixed
-     */
-    public $repository;
-
-    /**
-     * settings
-     *
-     * @var mixed
-     */
-    public $settings;
-
-    public function __construct(PaymentMethodRepository $repository)
-    {
-        $this->repository = $repository;
-        $this->settings = Settings::first();
+    public function __construct(
+        public readonly PaymentMethodRepository $repository,
+        public readonly ?Settings $settings = null
+    ) {
+        $this->settings ??= Settings::first();
     }
 
     /**
