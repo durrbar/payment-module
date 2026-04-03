@@ -10,12 +10,7 @@ use Modules\Payment\Services\PaymentService;
 
 class OrderCreatedListener
 {
-    private PaymentService $paymentService;
-
-    public function __construct(PaymentService $paymentService)
-    {
-        $this->paymentService = $paymentService;
-    }
+    public function __construct(private PaymentService $paymentService) {}
 
     public function handle(OrderCreatedEvent $event)
     {

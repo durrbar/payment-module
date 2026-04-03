@@ -10,15 +10,10 @@ use Modules\Payment\Services\PaymentService;
 
 class PaymentCreatedListener
 {
-    private PaymentService $paymentService;
-
     /**
      * Create the event listener.
      */
-    public function __construct(PaymentService $paymentService)
-    {
-        $this->paymentService = $paymentService;
-    }
+    public function __construct(private PaymentService $paymentService) {}
 
     /**
      * Handle the event.
